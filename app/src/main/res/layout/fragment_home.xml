@@ -32,16 +32,16 @@
             android:baselineAligned="false">
             <!-- ... Colunas Receita, Despesa, Saldo ... -->
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Receitas" android:textSize="12sp"/>
-                <TextView android:id="@+id/txtTotalReceitas" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textStyle="bold" android:textColor="@color/green"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/receitas" android:textSize="12sp"/>
+                <TextView android:id="@+id/txtTotalReceitas" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/r_0" android:textStyle="bold" android:textColor="@color/green"/>
             </LinearLayout>
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Despesas" android:textSize="12sp"/>
-                <TextView android:id="@+id/txtTotalDespesas" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textStyle="bold" android:textColor="@color/red"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/despesas" android:textSize="12sp"/>
+                <TextView android:id="@+id/txtTotalDespesas" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/r_0"  android:textStyle="bold" android:textColor="@color/red"/>
             </LinearLayout>
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Saldo" android:textSize="12sp" android:textStyle="bold"/>
-                <TextView android:id="@+id/txtSaldoFinal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textStyle="bold" android:textColor="@android:color/black"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/saldo" android:textSize="12sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/txtSaldoFinal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/r_0"  android:textStyle="bold" android:textColor="@android:color/black"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -54,23 +54,22 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:gravity="center"
         app:singleSelection="true"
         app:selectionRequired="true"
         app:layout_constraintTop_toBottomOf="@id/cardResumo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
         <!-- ... Chips ... -->
-        <com.google.android.material.chip.Chip android:id="@+id/chipMesAtual" style="@style/Widget.MaterialComponents.Chip.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mês Atual" android:checked="true"/>
+        <com.google.android.material.chip.Chip android:id="@+id/chipMesAtual" style="@style/Widget.MaterialComponents.Chip.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/mes_atual" android:checked="true"/>
 
-        <com.google.android.material.chip.Chip android:id="@+id/chip30Dias" style="@style/Widget.MaterialComponents.Chip.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Últimos 30 dias" />
+        <com.google.android.material.chip.Chip android:id="@+id/chip30Dias" style="@style/Widget.MaterialComponents.Chip.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ultimos_30_dias" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipPorPeriodo"
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Por Período" />
+            android:text="@string/por_periodo" />
     </com.google.android.material.chip.ChipGroup>
 
     <!-- 3. Lista de Lançamentos -->
@@ -97,6 +96,6 @@
         android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Adicionar" />
+        android:contentDescription="@string/adicionar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

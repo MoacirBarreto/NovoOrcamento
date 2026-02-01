@@ -1,48 +1,117 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    tools:context=".GraficosFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        tools:context=".GraficosFragment">
+        android:paddingBottom="24dp">
 
-        <TextView
-            android:id="@+id/txtTituloGrafico"
-            android:layout_width="wrap_content"
+        <!-- 1. CARD DE RESUMO -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardResumoGrafico"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Análise Financeira"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="#F5F5F5"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Filtros -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:weightSum="3">
+
+                <!-- Receitas -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Receitas"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/txtTotalReceitasGrafico"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 0,00"
+                        android:textColor="@color/green"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Despesas -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Despesas"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/txtTotalDespesasGrafico"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 0,00"
+                        android:textColor="@color/red"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Saldo -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Saldo"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/txtSaldoFinalGrafico"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 0,00"
+                        android:textColor="@android:color/black"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- 2. FILTROS -->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupFiltrosGrafico"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:gravity="center"
-            app:singleSelection="true"
+            android:layout_margin="16dp"
             app:selectionRequired="true"
-            app:layout_constraintTop_toBottomOf="@id/txtTituloGrafico"
+            app:singleSelection="true"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/cardResumoGrafico">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipMesAtualGrafico"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
                 android:text="Mês Atual" />
 
             <com.google.android.material.chip.Chip
@@ -50,58 +119,54 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Últimos 30 Dias" />
+                android:text="30 Dias" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipPorPeriodoGrafico"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Por Período" />
-
+                android:text="Período" />
         </com.google.android.material.chip.ChipGroup>
 
-        <!-- Gráfico de Barras (Receita x Despesa) -->
+        <!-- 3. TÍTULO E GRÁFICO DE BARRAS -->
         <TextView
-            android:id="@+id/lblBarChart"
+            android:id="@+id/lblBarras"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Balanço (Receita vs Despesa)"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Resumo Mensal"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/chipGroupFiltrosGrafico" />
 
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/barChart"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lblBarChart" />
+            android:layout_margin="16dp"
+            app:layout_constraintTop_toBottomOf="@id/lblBarras" />
 
-        <!-- NOVO: Gráfico de Pizza (Despesas por Categoria) -->
+        <!-- 4. TÍTULO E GRÁFICO DE PIZZA -->
         <TextView
-            android:id="@+id/lblPieChart"
+            android:id="@+id/lblPizza"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="Despesas por Categoria"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="Gastos por Categoria"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/barChart" />
 
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/pieChart"
-            android:layout_width="0dp"
-            android:layout_height="300dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lblPieChart" />
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_margin="16dp"
+            app:layout_constraintTop_toBottomOf="@id/lblPizza"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
