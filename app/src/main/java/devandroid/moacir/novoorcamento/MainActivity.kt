@@ -2,7 +2,8 @@ package devandroid.moacir.novoorcamento
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import devandroid.moacir.novoorcamento.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -14,30 +15,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Carrega o Fragmento inicial (Home)
-        if (savedInstanceState == null) {
-            trocarFragment(HomeFragment())
-        }
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.fragmentContainer) as NavHostFragment
+        val navController = navHostFragment.navController
 
-        // Configura o clique na barra
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    trocarFragment(HomeFragment())
-                    true
-                }
-                R.id.nav_graficos -> {
-                    trocarFragment(GraficosFragment())
-                    true
-                }
-                else -> false
-            }
-        }
-    }
-
-    private fun trocarFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
+        // ESTA LINHA SOZINHA resolve a navegação para Home, Graficos E Personalizar!
+        NavigationUI.setupWithNavController(binding.bottomNavigation, navController)
     }
 }

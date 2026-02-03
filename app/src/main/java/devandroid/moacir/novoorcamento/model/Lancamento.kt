@@ -2,19 +2,21 @@ package devandroid.moacir.novoorcamento.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(
-    tableName = "lancamentos",// Configura a chave estrangeira (relação com Categoria)
+    tableName = "lancamentos",
     foreignKeys = [
         ForeignKey(
             entity = Categoria::class,
-            parentColumns = ["id"],     // ID na tabela Categoria
-            childColumns = ["categoriaID"], // Coluna nesta tabela
-            onDelete = ForeignKey.CASCADE   // Se apagar a categoria, apaga os lançamentos dela
+            parentColumns = ["id"],
+            childColumns = ["categoriaID"],
+            onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    // ADICIONE ESTA LINHA ABAIXO PARA CORRIGIR O ERRO
+    indices = [Index(value = ["categoriaID"])]
 )
 data class Lancamento(
     @PrimaryKey(autoGenerate = true)
@@ -22,8 +24,8 @@ data class Lancamento(
 
     val descricao: String,
     val valor: Double,
-    val data: Long, // Guardaremos data como milissegundos (timestamp) para simplificar
+    val data: Long, // Guardaremos data como milissegundos (timestamp)
 
-    val categoriaID: Int, // Chave estrangeira
-    val tipo: TipoLancamento // Nosso Enum (RECEITA ou DESPESA)
+    val categoriaID: Int, // Chave estrangeira indexada
+    val tipo: TipoLancamento // Enum (RECEITA ou DESPESA)
 )

@@ -4,16 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import devandroid.moacir.novoorcamento.model.Categoria
 import devandroid.moacir.novoorcamento.model.Lancamento
-import java.util.concurrent.Executors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-@Database(entities = [Categoria::class, Lancamento::class], version = 1)
+
+@Database(entities = [Categoria::class, Lancamento::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
 
-    // Aqui definiremos os DAOs depois
     abstract fun orcamentoDao(): OrcamentoDao
 
     companion object {
@@ -27,34 +28,41 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "orcamento_db"
                 )
-                    .addCallback(DatabaseCallback) // <--- O SEGREDO ESTÁ AQUI
-                    .allowMainThreadQueries() // Simplificando para este estágio inicial
+                    .fallbackToDestructiveMigration()
+                    .addCallback(DatabaseCallback) // O Callback agora lida com os dois casos
+                    //.allowMainThreadQueries()
                     .build()
                 INSTANCE = instance
                 instance
             }
         }
 
-        // Isso roda apenas quando o app é instalado/banco criado pela 1ª vez
         private val DatabaseCallback = object : RoomDatabase.Callback() {
+            // Chamado na primeira instalação
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
+                prepopularCategorias()
+            }
 
-                Executors.newSingleThreadExecutor().execute {
+            // CHAMADO QUANDO O BANCO É APAGADO E REFEITO (O seu caso atual)
+            override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
+                super.onDestructiveMigration(db)
+                prepopularCategorias()
+            }
+
+            private fun prepopularCategorias() {
+                // Use GlobalScope or a custom scope to launch a coroutine on the IO thread
+                CoroutineScope(Dispatchers.IO).launch {
                     val dao = INSTANCE?.orcamentoDao()
-
-                    // Suas categorias iniciais
                     val list = listOf(
-                        Categoria(nome = "Receita"),
-                        Categoria(nome = "Alimentação"),
-                        Categoria(nome = "Casa"),
-                        Categoria(nome = "Lazer"),
-                        Categoria(nome = "Transporte"),
-                        Categoria(nome = "Outros")
+                        Categoria(id = 1, nome = "Receita"),
+                        Categoria(id = 2, nome = "Alimentação"),
+                        Categoria(id = 3, nome = "Casa"),
+                        Categoria(id = 4, nome = "Lazer"),
+                        Categoria(id = 5, nome = "Transporte"),
+                        Categoria(id = 6, nome = "Outros")
                     )
-
-                    // Inserir todas
-                    list.forEach { dao?.inserirCategoria(it) }
+                    list.forEach { dao?.upsertCategoria(it) }
                 }
             }
         }

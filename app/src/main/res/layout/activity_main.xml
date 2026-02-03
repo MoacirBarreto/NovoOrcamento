@@ -24,12 +24,15 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- 2. CONTAINER DOS FRAGMENTS (Conteúdo) -->
-    <!-- Note que ele começa ABAIXO do appBarLayout -->
-    <FrameLayout
+    <!-- 2. CONTAINER DE NAVEGAÇÃO (NavHostFragment) -->
+    <!-- Trocado de FrameLayout para FragmentContainerView para suportar Navigation -->
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
         app:layout_constraintStart_toStartOf="parent"

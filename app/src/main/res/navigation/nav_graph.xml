@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_home">
+
+    <!-- Tela Inicial -->
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="devandroid.moacir.novoorcamento.HomeFragment"
+        android:label="Início"
+        tools:layout="@layout/fragment_home" />
+
+    <!-- Tela de Gráficos -->
+    <fragment
+        android:id="@+id/nav_graficos"
+        android:name="devandroid.moacir.novoorcamento.GraficosFragment"
+        android:label="Gráficos"
+        tools:layout="@layout/fragment_graficos" />
+
+    <fragment
+        android:id="@+id/action_personalizar"
+        android:name="devandroid.moacir.novoorcamento.PersonalizacaoFragment"
+        android:label="Personalizar"
+        tools:layout="@layout/fragment_personalizacao" />
+
+</navigation>

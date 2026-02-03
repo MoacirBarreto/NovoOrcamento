@@ -8,4 +8,12 @@
     <string name="r_0">R$ 0,00</string>
     <string name="despesas">Despesas</string>
     <string name="saldo">Saldo</string>
+    <string name="categoria_6">Categoria 6</string>
+    <string name="categoria_5">Categoria 5</string>
+    <string name="categoria_4">Categoria 4</string>
+    <string name="categoria_3">Categoria 3</string>
+    <string name="categoria_2">Categoria 2</string>
+    <string name="categoria_1">Categoria 1</string>
+    <string name="defina_suas_5_cat">Defina suas 5 categorias principais de despesas:</string>
+    <string name="personalizar_categorias">Personalizar Categorias</string>
 </resources>
