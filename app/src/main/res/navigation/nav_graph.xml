@@ -19,6 +19,12 @@
         tools:layout="@layout/fragment_graficos" />
 
     <fragment
+        android:id="@+id/agendaFragment"
+        android:name="devandroid.moacir.novoorcamento.AgendaFragment"
+        android:label="Agenda"
+        tools:layout="@layout/fragment_agenda" />
+
+    <fragment
         android:id="@+id/action_personalizar"
         android:name="devandroid.moacir.novoorcamento.PersonalizacaoFragment"
         android:label="Personalizar"

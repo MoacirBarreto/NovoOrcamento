@@ -7,15 +7,17 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import devandroid.moacir.novoorcamento.model.Categoria
 import devandroid.moacir.novoorcamento.model.Lancamento
+import devandroid.moacir.novoorcamento.model.Agenda
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
-@Database(entities = [Categoria::class, Lancamento::class], version = 2)
+// 1. Adicionado Agenda::class aqui
+@Database(entities = [Categoria::class, Lancamento::class, Agenda::class], version = 3)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun orcamentoDao(): OrcamentoDao
+    abstract fun agendaDao(): AgendaDao
 
     companion object {
         @Volatile
@@ -29,8 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "orcamento_db"
                 )
                     .fallbackToDestructiveMigration()
-                    .addCallback(DatabaseCallback) // O Callback agora lida com os dois casos
-                    //.allowMainThreadQueries()
+                    .addCallback(DatabaseCallback)
                     .build()
                 INSTANCE = instance
                 instance
@@ -38,20 +39,18 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private val DatabaseCallback = object : RoomDatabase.Callback() {
-            // Chamado na primeira instalação
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
                 prepopularCategorias()
             }
 
-            // CHAMADO QUANDO O BANCO É APAGADO E REFEITO (O seu caso atual)
             override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
                 super.onDestructiveMigration(db)
                 prepopularCategorias()
             }
 
             private fun prepopularCategorias() {
-                // Use GlobalScope or a custom scope to launch a coroutine on the IO thread
+                // Escopo de Coroutine para rodar em segundo plano
                 CoroutineScope(Dispatchers.IO).launch {
                     val dao = INSTANCE?.orcamentoDao()
                     val list = listOf(
