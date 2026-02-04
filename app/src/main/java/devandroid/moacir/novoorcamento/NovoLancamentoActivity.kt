@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import devandroid.moacir.novoorcamento.database.AppDatabase
 import devandroid.moacir.novoorcamento.databinding.ActivityNovoLancamentoBinding
+import devandroid.moacir.novoorcamento.model.Agenda
 import devandroid.moacir.novoorcamento.model.Categoria
 import devandroid.moacir.novoorcamento.model.Lancamento
 import devandroid.moacir.novoorcamento.model.TipoLancamento
@@ -29,11 +30,15 @@ class NovoLancamentoActivity : AppCompatActivity() {
 
     private var categorias: List<Categoria> = emptyList()
     private var dataSelecionadaMillis: Long = System.currentTimeMillis()
-    private var lancamentoParaEditar: Lancamento? = null
+    private var isAgenda: Boolean = false
+    private var idEdicao: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        isAgenda = intent.getBooleanExtra("IS_AGENDA", false)
+        idEdicao = intent.getIntExtra("LANCAMENTO_ID", -1)
 
         inicializarComponentes()
     }
@@ -43,19 +48,25 @@ class NovoLancamentoActivity : AppCompatActivity() {
         configurarCampoData()
         configurarMudancaDeTipo()
         configurarBotaoSalvar()
+        configurarSelecaoCategoria() // Listener para preencher a descrição
 
-        // Carregamos os dados de forma assíncrona
+        if (isAgenda) {
+            binding.txtTituloTela.text = if (idEdicao != -1) "Editar Agendamento" else "Novo Agendamento"
+        } else {
+            binding.txtTituloTela.text = if (idEdicao != -1) "Editar Lançamento" else "Novo Lançamento"
+        }
+
         carregarDadosIniciais()
     }
 
     private fun carregarDadosIniciais() {
         lifecycleScope.launch {
-            // 1. Busca categorias em segundo plano
+            // Busca categorias no Banco (Thread IO)
             categorias = withContext(Dispatchers.IO) {
                 db.orcamentoDao().listarCategorias()
             }
 
-            // 2. Configura o Spinner
+            // Configura o Spinner
             val adapter = ArrayAdapter(
                 this@NovoLancamentoActivity,
                 android.R.layout.simple_spinner_dropdown_item,
@@ -63,48 +74,35 @@ class NovoLancamentoActivity : AppCompatActivity() {
             )
             binding.spinnerCategorias.adapter = adapter
 
-            // 3. Verifica se é edição
-            val idLancamento = intent.getIntExtra("LANCAMENTO_ID", -1)
-            if (idLancamento != -1) {
-                binding.txtTituloTela.text = "Editar Lançamento"
-                carregarDadosParaEdicao(idLancamento)
+            // Se for edição, carrega os dados existentes
+            if (idEdicao != -1) {
+                if (isAgenda) carregarAgendaParaEdicao(idEdicao)
+                else carregarLancamentoParaEdicao(idEdicao)
             } else {
-                binding.txtTituloTela.text = "Novo Lançamento"
-                atualizarVisibilidadeCategoria(binding.rbDespesa.isChecked)
+                // Se for novo e Despesa, já sugere a primeira categoria
+                atualizarDescricaoPelaCategoria()
             }
         }
     }
 
-    private suspend fun carregarDadosParaEdicao(id: Int) {
-        // Busca o lançamento específico no banco (Thread IO)
-        val lancamento = withContext(Dispatchers.IO) {
-            // IMPORTANTE: Use find { it.id == id } na lista ou crie buscarPorId no DAO
-            db.orcamentoDao().listarLancamentosSemFlow().find { it.id == id }
-        }
-
-        lancamento?.let {
-            lancamentoParaEditar = it
-            preencherCampos(it)
+    private fun configurarSelecaoCategoria() {
+        binding.spinnerCategorias.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // Atualiza a descrição automaticamente apenas se for um novo registro
+                if (idEdicao == -1 && binding.rbDespesa.isChecked) {
+                    atualizarDescricaoPelaCategoria()
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
 
-    private fun preencherCampos(lancamento: Lancamento) {
-        with(binding) {
-            // Formata valor (converte Double para string de centavos para o TextWatcher)
-            val valorEmCentavos = (lancamento.valor * 100).toLong().toString()
-            edtValor.setText(valorEmCentavos)
-            edtDescricao.setText(lancamento.descricao)
-
-            if (lancamento.tipo == TipoLancamento.RECEITA) rbReceita.isChecked = true
-            else rbDespesa.isChecked = true
-
-            atualizarVisibilidadeCategoria(lancamento.tipo == TipoLancamento.DESPESA)
-
-            val cal = Calendar.getInstance().apply { timeInMillis = lancamento.data }
-            atualizarTextoData(cal)
-
-            val posicao = categorias.indexOfFirst { it.id == lancamento.categoriaID }
-            if (posicao != -1) spinnerCategorias.setSelection(posicao)
+    private fun atualizarDescricaoPelaCategoria() {
+        val pos = binding.spinnerCategorias.selectedItemPosition
+        if (pos >= 0 && categorias.isNotEmpty()) {
+            binding.edtDescricao.setText(categorias[pos].nome)
+            // Move o cursor para o final
+            binding.edtDescricao.setSelection(binding.edtDescricao.text?.length ?: 0)
         }
     }
 
@@ -121,30 +119,71 @@ class NovoLancamentoActivity : AppCompatActivity() {
             val valorFinal = cleanValor.toDouble() / 100
             val tipo = if (binding.rbReceita.isChecked) TipoLancamento.RECEITA else TipoLancamento.DESPESA
 
-            val catId = if (tipo == TipoLancamento.DESPESA && categorias.isNotEmpty()) {
+            // Define ID da categoria (Se for receita, associamos à categoria "Receita" ou ID 1)
+            val catId = if (tipo == TipoLancamento.DESPESA) {
                 categorias[binding.spinnerCategorias.selectedItemPosition].id
             } else {
-                categorias.find { it.nome.equals("Receita", true) }?.id ?: 1
+                categorias.find { it.nome.contains("Receita", true) }?.id ?: 1
             }
 
-            val lancamento = lancamentoParaEditar?.copy(
-                descricao = descricao, valor = valorFinal, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
-            ) ?: Lancamento(
-                descricao = descricao, valor = valorFinal, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
-            )
-
-            // Salva de forma assíncrona
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
-                    db.orcamentoDao().upsertLancamento(lancamento)
+                    if (isAgenda) {
+                        val agenda = Agenda(
+                            id = if (idEdicao != -1) idEdicao else 0,
+                            descricao = descricao,
+                            valor = valorFinal,
+                            data = dataSelecionadaMillis,
+                            categoriaID = catId,
+                            tipo = tipo
+                        )
+                        db.agendaDao().upsertAgenda(agenda)
+                    } else {
+                        val lancamento = Lancamento(
+                            id = if (idEdicao != -1) idEdicao else 0,
+                            descricao = descricao,
+                            valor = valorFinal,
+                            data = dataSelecionadaMillis,
+                            categoriaID = catId,
+                            tipo = tipo
+                        )
+                        db.orcamentoDao().upsertLancamento(lancamento)
+                    }
                 }
-                Toast.makeText(this@NovoLancamentoActivity, "Sucesso!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@NovoLancamentoActivity, "Salvo com sucesso!", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
     }
 
-    // --- Métodos de UI mantidos e otimizados ---
+    private suspend fun carregarLancamentoParaEdicao(id: Int) {
+        val lancamento = withContext(Dispatchers.IO) {
+            db.orcamentoDao().listarLancamentosSemFlow().find { it.id == id }
+        }
+        lancamento?.let { preencherCampos(it.descricao, it.valor, it.data, it.tipo, it.categoriaID) }
+    }
+
+    private suspend fun carregarAgendaParaEdicao(id: Int) {
+        val agenda = withContext(Dispatchers.IO) {
+            db.agendaDao().buscarPorId(id)
+        }
+        agenda?.let { preencherCampos(it.descricao, it.valor, it.data, it.tipo, it.categoriaID) }
+    }
+
+    private fun preencherCampos(desc: String, valor: Double, data: Long, tipo: TipoLancamento, catId: Int) {
+        binding.edtDescricao.setText(desc)
+        // Converte Double para String de centavos para o TextWatcher formatar
+        val valorFormatado = (valor * 100).toLong().toString()
+        binding.edtValor.setText(valorFormatado)
+
+        if (tipo == TipoLancamento.RECEITA) binding.rbReceita.isChecked = true else binding.rbDespesa.isChecked = true
+
+        val cal = Calendar.getInstance().apply { timeInMillis = data }
+        atualizarTextoData(cal)
+
+        val posicao = categorias.indexOfFirst { it.id == catId }
+        if (posicao != -1) binding.spinnerCategorias.setSelection(posicao)
+    }
 
     private fun configurarCampoData() {
         val calendario = Calendar.getInstance()
@@ -156,24 +195,23 @@ class NovoLancamentoActivity : AppCompatActivity() {
         }
     }
 
-    private fun atualizarTextoData(calendario: Calendar) {
-        val formato = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
-        binding.edtData.setText(formato.format(calendario.time))
-        dataSelecionadaMillis = calendario.timeInMillis
+    private fun atualizarTextoData(cal: Calendar) {
+        binding.edtData.setText(SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR")).format(cal.time))
+        dataSelecionadaMillis = cal.timeInMillis
     }
 
     private fun configurarMudancaDeTipo() {
         binding.radioGroupTipo.setOnCheckedChangeListener { _, checkedId ->
-            atualizarVisibilidadeCategoria(checkedId == R.id.rbDespesa)
+            val isDespesa = checkedId == R.id.rbDespesa
+            binding.lblCategoria.visibility = if (isDespesa) View.VISIBLE else View.GONE
+            binding.spinnerCategorias.visibility = if (isDespesa) View.VISIBLE else View.GONE
+
+            if (!isDespesa) {
+                binding.edtDescricao.setText("Receita")
+            } else {
+                atualizarDescricaoPelaCategoria()
+            }
         }
-    }
-
-    private fun atualizarVisibilidadeCategoria(isDespesa: Boolean) {
-        val visibilidade = if (isDespesa) View.VISIBLE else View.GONE
-        binding.lblCategoria.visibility = visibilidade
-        binding.spinnerCategorias.visibility = visibilidade
-
-        if (!isDespesa) binding.edtDescricao.setText("Receita")
     }
 
     private fun configurarCampoValor() {
@@ -184,9 +222,9 @@ class NovoLancamentoActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 if (s.toString() != current) {
                     binding.edtValor.removeTextChangedListener(this)
-                    val cleanString = s.toString().replace(Regex("[^0-9]"), "")
-                    if (cleanString.isNotEmpty()) {
-                        val formatted = NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(cleanString.toDouble() / 100)
+                    val clean = s.toString().replace(Regex("[^0-9]"), "")
+                    if (clean.isNotEmpty()) {
+                        val formatted = NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(clean.toDouble() / 100)
                         current = formatted
                         binding.edtValor.setText(formatted)
                         binding.edtValor.setSelection(formatted.length)

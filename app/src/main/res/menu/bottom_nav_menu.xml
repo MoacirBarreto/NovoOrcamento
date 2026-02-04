@@ -11,6 +11,10 @@
         android:icon="@drawable/ic_chart"
         android:title="Gráficos" />
     <item
+        android:id="@+id/agendaFragment"
+        android:icon="@android:drawable/ic_menu_my_calendar"
+        android:title="Agenda" />
+    <item
         android:id="@+id/action_personalizar"
         android:title="Personalizar"
         android:icon="@android:drawable/ic_menu_preferences"
