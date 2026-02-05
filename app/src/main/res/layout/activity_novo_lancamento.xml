@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -18,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 1. Campo Valor (Primeiro campo, pois é o mais importante) -->
+    <!-- 1. Campo Valor -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilValor"
         android:layout_width="match_parent"
@@ -35,7 +34,7 @@
             android:maxLength="15" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- 2. Escolha do Tipo (Radio Group) -->
+    <!-- 2. Escolha do Tipo -->
     <TextView
         android:id="@+id/lblTipo"
         android:layout_width="wrap_content"
@@ -56,8 +55,8 @@
             android:id="@+id/rbDespesa"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Despesa"
-            android:checked="true" />
+            android:checked="true"
+            android:text="Despesa" />
 
         <RadioButton
             android:id="@+id/rbReceita"
@@ -67,7 +66,7 @@
             android:text="Receita" />
     </RadioGroup>
 
-    <!-- 3. Campo Data (Novo) -->
+    <!-- 3. Campo Data -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilData"
         android:layout_width="match_parent"
@@ -80,13 +79,13 @@
             android:id="@+id/edtData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="false"
             android:clickable="true"
-            android:inputType="none"
-            android:drawableEnd="@android:drawable/ic_menu_my_calendar" />
+            android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+            android:focusable="false"
+            android:inputType="none" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- 4. Spinner Categoria (Pode ficar invisível se for Receita) -->
+    <!-- 4. Spinner Categoria -->
     <TextView
         android:id="@+id/lblCategoria"
         android:layout_width="wrap_content"
@@ -104,7 +103,7 @@
         android:minHeight="48dp"
         app:layout_constraintTop_toBottomOf="@id/lblCategoria" />
 
-    <!-- 5. Campo Descrição (Agora embaixo da Categoria) -->
+    <!-- 5. Campo Descrição -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilDescricao"
         android:layout_width="match_parent"
@@ -120,12 +119,54 @@
             android:inputType="textCapSentences" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- 6. Container de Repetição (CORRIGIDO COM CONSTRAINTS) -->
+    <LinearLayout
+        android:id="@+id/containerRepetir"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/tilDescricao"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <CheckBox
+            android:id="@+id/chkRepetir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Repetir lançamento?" />
+
+        <EditText
+            android:id="@+id/edtQtdMeses"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:hint="Ex: 3"
+            android:inputType="number"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/txtMesesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="meses"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <!-- 7. Botão Salvar (Ancorado abaixo do container de repetição) -->
     <Button
         android:id="@+id/btnSalvarLancamento"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
+        android:padding="12dp"
         android:text="SALVAR"
-        app:layout_constraintTop_toBottomOf="@id/tilDescricao" />
+        app:layout_constraintTop_toBottomOf="@id/containerRepetir"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

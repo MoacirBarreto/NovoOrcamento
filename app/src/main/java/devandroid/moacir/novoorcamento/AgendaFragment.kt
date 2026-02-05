@@ -35,10 +35,8 @@ class AgendaFragment : Fragment() {
 
         binding.rvAgenda.layoutManager = LinearLayoutManager(requireContext())
 
-        // Observar a agenda (Flow)
         viewLifecycleOwner.lifecycleScope.launch {
             db.agendaDao().listarAgenda().collect { lista ->
-                // A lógica de verificar se está vazio deve ficar AQUI dentro
                 if (lista.isEmpty()) {
                     binding.txtAvisoVazio.visibility = View.VISIBLE
                     binding.rvAgenda.visibility = View.GONE
@@ -46,11 +44,17 @@ class AgendaFragment : Fragment() {
                     binding.txtAvisoVazio.visibility = View.GONE
                     binding.rvAgenda.visibility = View.VISIBLE
 
-                    // Configura ou atualiza o adapter com a lista que veio do banco
                     binding.rvAgenda.adapter = AgendaAdapter(
-                        lista,
+                        lista = lista,
                         onConfirmarClick = { item -> confirmarLancamento(item) },
-                        onDeleteClick = { item -> excluirDaAgenda(item) }
+                        onDeleteClick = { item -> excluirDaAgenda(item) },
+                        onItemClick = { item ->
+                            // Abre a tela de edição
+                            val intent = Intent(requireContext(), NovoLancamentoActivity::class.java)
+                            intent.putExtra("IS_AGENDA", true)
+                            intent.putExtra("LANCAMENTO_ID", item.id)
+                            startActivity(intent)
+                        }
                     )
                 }
             }
