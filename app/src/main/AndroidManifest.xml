@@ -37,7 +37,5 @@
             android:exported="false"
             android:label="Personalizar Categorias"
             />
-
     </application>
-
 </manifest>
