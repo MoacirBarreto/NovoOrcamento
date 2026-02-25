@@ -12,8 +12,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-// 1. Adicionado Agenda::class aqui
-@Database(entities = [Categoria::class, Lancamento::class, Agenda::class], version = 3)
+@Database(
+    entities = [Categoria::class, Lancamento::class, Agenda::class],
+    version = 3,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun orcamentoDao(): OrcamentoDao
@@ -41,28 +44,24 @@ abstract class AppDatabase : RoomDatabase() {
         private val DatabaseCallback = object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-                prepopularCategorias()
-            }
-
-            override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
-                super.onDestructiveMigration(db)
-                prepopularCategorias()
-            }
-
-            private fun prepopularCategorias() {
-                // Escopo de Coroutine para rodar em segundo plano
-                CoroutineScope(Dispatchers.IO).launch {
-                    val dao = INSTANCE?.orcamentoDao()
-                    val list = listOf(
-                        Categoria(id = 1, nome = "Receita"),
-                        Categoria(id = 2, nome = "Alimentação"),
-                        Categoria(id = 3, nome = "Casa"),
-                        Categoria(id = 4, nome = "Lazer"),
-                        Categoria(id = 5, nome = "Transporte"),
-                        Categoria(id = 6, nome = "Outros")
-                    )
-                    list.forEach { dao?.upsertCategoria(it) }
+                // Usamos o INSTANCE garantido após o build
+                INSTANCE?.let { database ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        prepopularCategorias(database.orcamentoDao())
+                    }
                 }
+            }
+
+            private suspend fun prepopularCategorias(dao: OrcamentoDao) {
+                val list = listOf(
+                    Categoria(id = 1, nome = "Receita"),
+                    Categoria(id = 2, nome = "Alimentação"),
+                    Categoria(id = 3, nome = "Casa"),
+                    Categoria(id = 4, nome = "Lazer"),
+                    Categoria(id = 5, nome = "Transporte"),
+                    Categoria(id = 6, nome = "Outros")
+                )
+                list.forEach { dao.upsertCategoria(it) }
             }
         }
     }

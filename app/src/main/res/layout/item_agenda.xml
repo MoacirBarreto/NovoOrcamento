@@ -1,20 +1,24 @@
-<!-- Use um layout similar ao item_lancamento, mas com um botão de confirmação -->
+<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardAgenda"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="4dp"
-    app:cardElevation="2dp"
-    layout_height=""
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:padding="12dp">
 
+        <!-- Informações do Lançamento -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -25,29 +29,53 @@
                 android:id="@+id/txtItemAgendaDescricao"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="Aluguel de Março" />
 
             <TextView
                 android:id="@+id/txtItemAgendaData"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp" />
+                android:layout_marginTop="2dp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp"
+                tools:text="15/03/2024" />
         </LinearLayout>
 
+        <!-- Valor -->
         <TextView
             android:id="@+id/txtItemAgendaValor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
-            android:textSize="16sp" />
+            android:textColor="@color/green"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="R$ 1.200,00" />
 
+        <!-- Botão Confirmar (Check) -->
         <ImageButton
             android:id="@+id/btnConfirmarPagamento"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Confirmar Pagamento"
             android:src="@android:drawable/checkbox_on_background"
             app:tint="@color/green" />
+
+        <!-- Botão Excluir (Lixeira) -->
+        <ImageButton
+            android:id="@+id/btnExcluir"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Excluir Agendamento"
+            android:src="@android:drawable/ic_menu_delete"
+            app:tint="@android:color/holo_red_dark" />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
