@@ -49,11 +49,30 @@ class NovoLancamentoActivity : AppCompatActivity() {
         configurarMudancaDeTipo()
         configurarBotaoSalvar()
         carregarDadosIniciais()
+        configurarCheckRepetir()
     }
+    private fun configurarCheckRepetir() {
+        binding.chkRepetir.setOnCheckedChangeListener { _, isChecked ->
+            val visibilidade = if (isChecked) View.VISIBLE else View.GONE
+            binding.edtQtdMeses.visibility = visibilidade
+            binding.txtMesesLabel.visibility = visibilidade
 
+            // Limpa o valor se desmarcar
+            if (!isChecked) binding.edtQtdMeses.setText("")
+        }
+    }
     private fun carregarDadosIniciais() {
         lifecycleScope.launch {
+            // Dentro do lifecycleScope no carregarDadosIniciais
             val idRecebido = intent.getIntExtra("LANCAMENTO_ID", -1)
+            val mostrarContainer = isAgenda && idRecebido == -1
+            binding.containerRepetir.visibility = if (mostrarContainer) View.VISIBLE else View.GONE
+
+// Se não for para mostrar (ex: edição), garante que o check está falso
+            if (!mostrarContainer) {
+                binding.chkRepetir.isChecked = false
+            }
+
             binding.containerRepetir.visibility = if (isAgenda && idRecebido == -1) View.VISIBLE else View.GONE
             // 1. Busca categorias
             categorias = withContext(Dispatchers.IO) {
@@ -139,8 +158,14 @@ class NovoLancamentoActivity : AppCompatActivity() {
         binding.btnSalvarLancamento.setOnClickListener {
             val descricao = binding.edtDescricao.text.toString()
             val cleanValor = binding.edtValor.text.toString().replace(Regex("[^0-9]"), "")
+
+            // Pega a quantidade do campo edtQtdMeses. Se estiver vazio, assume 1.
             val repetirStr = binding.edtQtdMeses.text.toString()
-            val numRepeticoes = if (isAgenda && repetirStr.isNotEmpty()) repetirStr.toInt() else 1
+            val numRepeticoes = if (isAgenda && binding.chkRepetir.isChecked && repetirStr.isNotEmpty()) {
+                repetirStr.toInt().coerceAtLeast(1) // Garante no mínimo 1
+            } else {
+                1
+            }
 
             if (descricao.isBlank() || cleanValor.isBlank()) {
                 Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
@@ -159,7 +184,7 @@ class NovoLancamentoActivity : AppCompatActivity() {
                 withContext(Dispatchers.IO) {
                     if (isAgenda) {
                         if (agendaParaEditar != null) {
-                            // EDIÇÃO: Apenas um item, ignora repetição
+                            // EDIÇÃO: Apenas atualiza o item atual
                             val agenda = agendaParaEditar!!.copy(
                                 descricao = descricao,
                                 valor = valorFinal,
@@ -169,7 +194,7 @@ class NovoLancamentoActivity : AppCompatActivity() {
                             )
                             db.agendaDao().upsertAgenda(agenda)
                         } else {
-                            // NOVO ITEM: Lógica de Repetição
+                            // NOVO ITEM: Lógica de Repetição (Parcelamento)
                             val cal = Calendar.getInstance().apply {
                                 timeInMillis = dataSelecionadaMillis
                             }
@@ -181,25 +206,28 @@ class NovoLancamentoActivity : AppCompatActivity() {
                                     descricao
                                 }
 
+                                // IMPORTANTE: id = 0 garante que o Room crie um NOVO registro
                                 val novaAgenda = Agenda(
+                                    id = 0,
                                     descricao = descricaoComParcela,
                                     valor = valorFinal,
-                                    data = cal.timeInMillis, // Usa a data atualizada do calendário
+                                    data = cal.timeInMillis,
                                     categoriaID = catId,
                                     tipo = tipo
                                 )
 
                                 db.agendaDao().upsertAgenda(novaAgenda)
 
-                                // Incrementa 1 mês para a próxima parcela
+                                // Adiciona exatamente 1 mês para a próxima parcela
                                 cal.add(Calendar.MONTH, 1)
                             }
                         }
                     } else {
-                        // MODO LANÇAMENTO COMUM (Seu código atual...)
+                        // MODO LANÇAMENTO COMUM
                         val lancamento = lancamentoParaEditar?.copy(
                             descricao = descricao, valor = valorFinal, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
                         ) ?: Lancamento(
+                            id = 0,
                             descricao = descricao, valor = valorFinal, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
                         )
                         db.orcamentoDao().upsertLancamento(lancamento)
@@ -211,10 +239,8 @@ class NovoLancamentoActivity : AppCompatActivity() {
                     finish()
                 }
             }
-
         }
     }
-
     private fun configurarCampoData() {
         val calendario = Calendar.getInstance()
         binding.edtData.setOnClickListener {
