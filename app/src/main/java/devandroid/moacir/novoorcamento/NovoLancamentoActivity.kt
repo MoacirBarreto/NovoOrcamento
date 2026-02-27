@@ -78,7 +78,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
             categorias = withContext(Dispatchers.IO) {
                 db.orcamentoDao().listarCategorias()
             }
-
             // 2. Configura Spinner
             val adapter = ArrayAdapter(
                 this@NovoLancamentoActivity,
