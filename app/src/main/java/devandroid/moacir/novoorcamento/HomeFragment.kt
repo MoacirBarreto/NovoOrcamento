@@ -21,13 +21,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var db: AppDatabase
     private var dataInicioPersonalizada: Long = 0L
     private var dataFimPersonalizada: Long = 0L
@@ -57,11 +59,9 @@ class HomeFragment : Fragment() {
             carregarLista(chipId)
         }
     }
-
     private fun configurarRecyclerView() {
         binding.rvLancamentos.layoutManager = LinearLayoutManager(requireContext())
     }
-
     private fun configurarFab() {
         binding.fabAdicionar.setOnClickListener {
             val intent = Intent(requireContext(), NovoLancamentoActivity::class.java)
@@ -98,7 +98,8 @@ class HomeFragment : Fragment() {
                 val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
                 val offset = TimeZone.getDefault().getOffset(Date().time).toLong()
 
-                binding.chipPorPeriodo.text = "${formato.format(Date(dataInicio + offset))} - ${formato.format(Date(dataFim + offset))}"
+                binding.chipPorPeriodo.text =
+                    "${formato.format(Date(dataInicio + offset))} - ${formato.format(Date(dataFim + offset))}"
                 carregarLista(R.id.chipPorPeriodo)
             }
         }
@@ -107,29 +108,46 @@ class HomeFragment : Fragment() {
     }
 
     private fun carregarLista(chipId: Int) {
-        viewLifecycleOwner.lifecycleScope.launch {val calendario = Calendar.getInstance()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val calendario = Calendar.getInstance()
             calendario.set(Calendar.HOUR_OF_DAY, 0)
             calendario.set(Calendar.MINUTE, 0)
             calendario.set(Calendar.SECOND, 0)
             calendario.set(Calendar.MILLISECOND, 0)
 
             // Explicitly cast the result to List<Lancamento>
+            // Dentro de carregarLista(chipId: Int)
             val listaFiltrada = withContext(Dispatchers.IO) {
+                val agora = Calendar.getInstance().timeInMillis // Data/Hora exata de agora
+
                 when (chipId) {
                     R.id.chipMesAtual -> {
                         calendario.set(Calendar.DAY_OF_MONTH, 1)
-                        db.orcamentoDao().listarLancamentosPorPeriodo(calendario.timeInMillis, Long.MAX_VALUE)
+                        // Do dia 1º às 00:00 até Agora
+                        db.orcamentoDao().listarLancamentosPorPeriodo(calendario.timeInMillis, agora)
                     }
+
                     R.id.chip30Dias -> {
-                        calendario.add(Calendar.DAY_OF_YEAR, -30)
-                        db.orcamentoDao().listarLancamentosPorPeriodo(calendario.timeInMillis, Long.MAX_VALUE)
+                        val cal30 = Calendar.getInstance()
+                        cal30.add(Calendar.DAY_OF_YEAR, -30)
+                        cal30.set(Calendar.HOUR_OF_DAY, 0)
+                        cal30.set(Calendar.MINUTE, 0)
+                        cal30.set(Calendar.SECOND, 0)
+                        // De 30 dias atrás às 00:00 até Agora
+                        db.orcamentoDao().listarLancamentosPorPeriodo(cal30.timeInMillis, agora)
                     }
+
                     R.id.chipPorPeriodo -> {
-                        db.orcamentoDao().listarLancamentosPorPeriodo(dataInicioPersonalizada, dataFimPersonalizada + 86400000)
+                        // Garante que o fim do período inclua o dia inteiro (soma 23h 59min)
+                        db.orcamentoDao().listarLancamentosPorPeriodo(
+                            dataInicioPersonalizada,
+                            dataFimPersonalizada + 86399999
+                        )
                     }
+
                     else -> db.orcamentoDao().listarLancamentos()
                 }
-            } as List<Lancamento> // <--- ADD THIS CAST HERE
+            } as List<Lancamento>
 
             if (chipId != R.id.chipPorPeriodo) binding.chipPorPeriodo.text = "Por Período"
             atualizarRecyclerView(listaFiltrada)

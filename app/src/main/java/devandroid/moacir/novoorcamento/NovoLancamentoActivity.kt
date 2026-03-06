@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -30,7 +31,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
     private var categorias: List<Categoria> = emptyList()
     private var dataSelecionadaMillis: Long = System.currentTimeMillis()
 
-    // Controle de Edição
     private var isAgenda: Boolean = false
     private var lancamentoParaEditar: Lancamento? = null
     private var agendaParaEditar: Agenda? = null
@@ -40,6 +40,10 @@ class NovoLancamentoActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         isAgenda = intent.getBooleanExtra("IS_AGENDA", false)
+
+        // Inicializa a data atual no campo
+        atualizarTextoData(Calendar.getInstance())
+
         inicializarComponentes()
     }
 
@@ -48,37 +52,35 @@ class NovoLancamentoActivity : AppCompatActivity() {
         configurarCampoData()
         configurarMudancaDeTipo()
         configurarBotaoSalvar()
-        carregarDadosIniciais()
         configurarCheckRepetir()
+        carregarDadosIniciais()
     }
+
     private fun configurarCheckRepetir() {
         binding.chkRepetir.setOnCheckedChangeListener { _, isChecked ->
             val visibilidade = if (isChecked) View.VISIBLE else View.GONE
             binding.edtQtdMeses.visibility = visibilidade
             binding.txtMesesLabel.visibility = visibilidade
 
-            // Limpa o valor se desmarcar
             if (!isChecked) binding.edtQtdMeses.setText("")
         }
     }
+
     private fun carregarDadosIniciais() {
         lifecycleScope.launch {
-            // Dentro do lifecycleScope no carregarDadosIniciais
             val idRecebido = intent.getIntExtra("LANCAMENTO_ID", -1)
-            val mostrarContainer = isAgenda && idRecebido == -1
-            binding.containerRepetir.visibility = if (mostrarContainer) View.VISIBLE else View.GONE
 
-// Se não for para mostrar (ex: edição), garante que o check está falso
-            if (!mostrarContainer) {
-                binding.chkRepetir.isChecked = false
-            }
+            // 1. Controle de visibilidade do container de repetição
+            val mostrarContainerRepetir = isAgenda && idRecebido == -1
+            binding.containerRepetir.visibility = if (mostrarContainerRepetir) View.VISIBLE else View.GONE
+            if (!mostrarContainerRepetir) binding.chkRepetir.isChecked = false
 
-            binding.containerRepetir.visibility = if (isAgenda && idRecebido == -1) View.VISIBLE else View.GONE
-            // 1. Busca categorias
+            // 2. Busca categorias no Banco
             categorias = withContext(Dispatchers.IO) {
                 db.orcamentoDao().listarCategorias()
             }
-            // 2. Configura Spinner
+
+            // 3. Configura Spinner
             val adapter = ArrayAdapter(
                 this@NovoLancamentoActivity,
                 android.R.layout.simple_spinner_dropdown_item,
@@ -86,27 +88,20 @@ class NovoLancamentoActivity : AppCompatActivity() {
             )
             binding.spinnerCategorias.adapter = adapter
 
-            binding.spinnerCategorias.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
-                    // Só preenche automaticamente se o campo descrição estiver vazio ou se não for uma edição
+            binding.spinnerCategorias.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    // Preenchimento automático apenas em novos lançamentos de despesa
                     if (idRecebido == -1 && binding.rbDespesa.isChecked) {
-                        val categoriaSelecionada = categorias[position].nome
-                        binding.edtDescricao.setText(categoriaSelecionada)
+                        binding.edtDescricao.setText(categorias[position].nome)
                     }
                 }
-
-                override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
 
-
-            // 3. Verifica se é edição (ID vem do Fragment/Activity chamadora)
+            // 4. Fluxo de Edição ou Novo
             if (idRecebido != -1) {
                 binding.txtTituloTela.text = if (isAgenda) "Editar Agenda" else "Editar Lançamento"
-                if (isAgenda) {
-                    carregarAgendaParaEdicao(idRecebido)
-                } else {
-                    carregarLancamentoParaEdicao(idRecebido)
-                }
+                if (isAgenda) carregarAgendaParaEdicao(idRecebido) else carregarLancamentoParaEdicao(idRecebido)
             } else {
                 binding.txtTituloTela.text = if (isAgenda) "Nova Agenda" else "Novo Lançamento"
                 atualizarVisibilidadeCategoria(binding.rbDespesa.isChecked)
@@ -139,15 +134,10 @@ class NovoLancamentoActivity : AppCompatActivity() {
             val valorEmCentavos = (valor * 100).toLong().toString()
             edtValor.setText(valorEmCentavos)
             edtDescricao.setText(desc)
-
-            if (tipo == TipoLancamento.RECEITA) rbReceita.isChecked = true
-            else rbDespesa.isChecked = true
-
+            if (tipo == TipoLancamento.RECEITA) rbReceita.isChecked = true else rbDespesa.isChecked = true
             atualizarVisibilidadeCategoria(tipo == TipoLancamento.DESPESA)
-
             val cal = Calendar.getInstance().apply { timeInMillis = data }
             atualizarTextoData(cal)
-
             val posicao = categorias.indexOfFirst { it.id == catId }
             if (posicao != -1) spinnerCategorias.setSelection(posicao)
         }
@@ -158,13 +148,11 @@ class NovoLancamentoActivity : AppCompatActivity() {
             val descricao = binding.edtDescricao.text.toString()
             val cleanValor = binding.edtValor.text.toString().replace(Regex("[^0-9]"), "")
 
-            // Pega a quantidade do campo edtQtdMeses. Se estiver vazio, assume 1.
+            // Lógica de Repetição
             val repetirStr = binding.edtQtdMeses.text.toString()
             val numRepeticoes = if (isAgenda && binding.chkRepetir.isChecked && repetirStr.isNotEmpty()) {
-                repetirStr.toInt().coerceAtLeast(1) // Garante no mínimo 1
-            } else {
-                1
-            }
+                repetirStr.toInt().coerceAtLeast(1)
+            } else 1
 
             if (descricao.isBlank() || cleanValor.isBlank()) {
                 Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
@@ -183,65 +171,37 @@ class NovoLancamentoActivity : AppCompatActivity() {
                 withContext(Dispatchers.IO) {
                     if (isAgenda) {
                         if (agendaParaEditar != null) {
-                            // EDIÇÃO: Apenas atualiza o item atual
                             val agenda = agendaParaEditar!!.copy(
-                                descricao = descricao,
-                                valor = valorFinal,
-                                data = dataSelecionadaMillis,
-                                categoriaID = catId,
-                                tipo = tipo
+                                descricao = descricao, valor = valorFinal, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
                             )
                             db.agendaDao().upsertAgenda(agenda)
                         } else {
-                            // NOVO ITEM: Lógica de Repetição (Parcelamento)
-                            val cal = Calendar.getInstance().apply {
-                                timeInMillis = dataSelecionadaMillis
-                            }
-
+                            val cal = Calendar.getInstance().apply { timeInMillis = dataSelecionadaMillis }
                             for (i in 0 until numRepeticoes) {
-                                val descricaoComParcela = if (numRepeticoes > 1) {
-                                    "$descricao (${i + 1}/$numRepeticoes)"
-                                } else {
-                                    descricao
-                                }
-
-                                // IMPORTANTE: id = 0 garante que o Room crie um NOVO registro
-                                val novaAgenda = Agenda(
-                                    id = 0,
-                                    descricao = descricaoComParcela,
-                                    valor = valorFinal,
-                                    data = cal.timeInMillis,
-                                    categoriaID = catId,
-                                    tipo = tipo
-                                )
-
-                                db.agendaDao().upsertAgenda(novaAgenda)
-
-                                // Adiciona exatamente 1 mês para a próxima parcela
-                                cal.add(Calendar.MONTH, 1)
+                                val descFinal = if (numRepeticoes > 1) "$descricao (${i + 1}/$numRepeticoes)" else descricao
+                                db.agendaDao().upsertAgenda(Agenda(
+                                    id = 0, descricao = descFinal, valor = valorFinal, data = cal.timeInMillis, categoriaID = catId, tipo = tipo
+                                ))
+                                cal.add(Calendar.MONTH, 1) // Incrementa o mês para a próxima parcela
                             }
                         }
                     } else {
-                        // MODO LANÇAMENTO COMUM
                         val lancamento = lancamentoParaEditar?.copy(
                             descricao = descricao, valor = valorFinal, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
                         ) ?: Lancamento(
-                            id = 0,
-                            descricao = descricao, valor = valorFinal, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
+                            id = 0, descricao = descricao, valor = valorFinal, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
                         )
                         db.orcamentoDao().upsertLancamento(lancamento)
                     }
                 }
-
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@NovoLancamentoActivity, "Salvo com sucesso!", Toast.LENGTH_SHORT).show()
-                    finish()
-                }
+                Toast.makeText(this@NovoLancamentoActivity, "Salvo com sucesso!", Toast.LENGTH_SHORT).show()
+                finish()
             }
         }
     }
+
     private fun configurarCampoData() {
-        val calendario = Calendar.getInstance()
+        val calendario = Calendar.getInstance().apply { timeInMillis = dataSelecionadaMillis }
         binding.edtData.setOnClickListener {
             DatePickerDialog(this, { _, ano, mes, dia ->
                 calendario.set(ano, mes, dia)
@@ -260,13 +220,9 @@ class NovoLancamentoActivity : AppCompatActivity() {
         binding.radioGroupTipo.setOnCheckedChangeListener { _, checkedId ->
             val isDespesa = checkedId == R.id.rbDespesa
             atualizarVisibilidadeCategoria(isDespesa)
-
-            // Se for modo "Novo", ajuda o usuário preenchendo o título
             if (intent.getIntExtra("LANCAMENTO_ID", -1) == -1) {
-                if (!isDespesa) {
-                    binding.edtDescricao.setText("Receita")
-                } else {
-                    // Volta para a categoria selecionada no spinner
+                if (!isDespesa) binding.edtDescricao.setText("Receita")
+                else {
                     val pos = binding.spinnerCategorias.selectedItemPosition
                     if (pos != -1) binding.edtDescricao.setText(categorias[pos].nome)
                 }

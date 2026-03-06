@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="24dp">
+        android:paddingBottom="32dp">
 
         <!-- 1. CARD DE RESUMO -->
         <androidx.cardview.widget.CardView
@@ -29,7 +30,6 @@
                 android:padding="16dp"
                 android:weightSum="3">
 
-                <!-- Receitas -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -50,7 +50,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Despesas -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -71,7 +70,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Saldo -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -119,7 +117,7 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="30 Dias" />
+                android:text="Últimos 30 dias" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipPorPeriodoGrafico"
@@ -129,17 +127,17 @@
                 android:text="Período" />
         </com.google.android.material.chip.ChipGroup>
 
-        <!-- 3. TÍTULO E GRÁFICO DE BARRAS -->
+        <!-- [ORDEM 1] GRÁFICO DE BARRAS (RECEITAS VS DESPESAS) -->
         <TextView
             android:id="@+id/lblBarras"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Resumo Mensal"
+            android:layout_marginTop="24dp"
+            android:text="Receitas vs Despesas"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chipGroupFiltrosGrafico" />
+            app:layout_constraintTop_toBottomOf="@+id/chipGroupFiltrosGrafico" />
 
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/barChart"
@@ -148,25 +146,44 @@
             android:layout_margin="16dp"
             app:layout_constraintTop_toBottomOf="@id/lblBarras" />
 
-        <!-- 4. TÍTULO E GRÁFICO DE PIZZA -->
+        <!-- [ORDEM 2] GRÁFICO DE PIZZA (DESPESAS POR CATEGORIA) -->
         <TextView
             android:id="@+id/lblPizza"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
-            android:text="Gastos por Categoria"
+            android:text="@string/despesas_por_categoria"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/barChart" />
+            app:layout_constraintTop_toBottomOf="@+id/barChart" />
 
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/pieChart"
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:layout_margin="16dp"
-            app:layout_constraintTop_toBottomOf="@id/lblPizza"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/lblPizza" />
+
+        <!-- [ORDEM 3] GRÁFICO DE LINHA (EVOLUÇÃO MENSAL) -->
+        <TextView
+            android:id="@+id/lblEvolucao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/evol_mensal_saldo"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pieChart" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_margin="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lblEvolucao" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

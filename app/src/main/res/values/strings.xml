@@ -5,7 +5,6 @@
     <string name="ultimos_30_dias">Últimos 30 dias</string>
     <string name="adicionar">Adicionar</string>
     <string name="receitas">Receitas</string>
-    <string name="r_0">R$ 0,00</string>
     <string name="despesas">Despesas</string>
     <string name="saldo">Saldo</string>
     <string name="categoria_6">Categoria 6</string>
@@ -16,4 +15,9 @@
     <string name="categoria_1">Categoria 1</string>
     <string name="defina_suas_5_cat">Defina suas 5 categorias principais de despesas:</string>
     <string name="personalizar_categorias">Personalizar Categorias</string>
+    <string name="despesas_por_categoria">Despesas por Categoria</string>
+    <string name="periodo">Período</string>
+    <string name="RS_0">R$ 0,00</string>
+    <string name="resumo_mensal">Resumo Mensal</string>
+    <string name="evol_mensal_saldo">Evolução Mensal do Saldo</string>
 </resources>

@@ -9,8 +9,8 @@ import androidx.room.Update
 import androidx.room.Upsert
 import devandroid.moacir.novoorcamento.model.Categoria
 import devandroid.moacir.novoorcamento.model.Lancamento
+import devandroid.moacir.novoorcamento.model.SaldoMensal
 import kotlinx.coroutines.flow.Flow
-
 
 @Dao
 interface OrcamentoDao {
@@ -43,18 +43,30 @@ interface OrcamentoDao {
     suspend fun listarLancamentosPorPeriodo(inicio: Long, fim: Long): List<Lancamento>
 
     @Transaction
-        @androidx.room.Upsert
-        suspend fun upsertCategoria(categoria: Categoria)
+    @androidx.room.Upsert
+    suspend fun upsertCategoria(categoria: Categoria)
 
-        @Transaction
-        suspend fun atualizarCategoriasFixas(nomes: List<String>) {
-            for (i in nomes.indices) {
-                val id = i + 1
-                val categoria = Categoria(id = id, nome = nomes[i])
-                upsertCategoria(categoria) // Now this will work
-            }
+    @Transaction
+    suspend fun atualizarCategoriasFixas(nomes: List<String>) {
+        for (i in nomes.indices) {
+            val id = i + 1
+            val categoria = Categoria(id = id, nome = nomes[i])
+            upsertCategoria(categoria) // Now this will work
         }
+    }
+
     @Query("SELECT * FROM lancamentos") // Substitua 'lancamentos' pelo nome da sua tabela
     suspend fun listarLancamentosSemFlow(): List<Lancamento>
-    }
+
+    @Query("""
+    SELECT 
+        strftime('%Y-%m', datetime(data/1000, 'unixepoch')) as mesAno,
+        SUM(CASE WHEN tipo = 'RECEITA' THEN valor ELSE -valor END) as saldo
+    FROM lancamentos 
+    GROUP BY mesAno 
+    ORDER BY mesAno ASC
+""")
+    fun obterEvolucaoSaldo(): Flow<List<SaldoMensal>>
+
+}
 
