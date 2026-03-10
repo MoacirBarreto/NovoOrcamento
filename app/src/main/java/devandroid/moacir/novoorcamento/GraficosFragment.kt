@@ -9,17 +9,11 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.github.mikephil.charting.animation.ChartAnimator
-import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.renderer.PieChartRenderer
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.github.mikephil.charting.utils.ViewPortHandler
 import com.google.android.material.datepicker.MaterialDatePicker
 import devandroid.moacir.novoorcamento.database.AppDatabase
 import devandroid.moacir.novoorcamento.databinding.FragmentGraficosBinding
@@ -28,21 +22,21 @@ import devandroid.moacir.novoorcamento.model.Lancamento
 import devandroid.moacir.novoorcamento.model.SaldoMensal
 import devandroid.moacir.novoorcamento.model.TipoLancamento
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlinx.coroutines.flow.first
 
 class GraficosFragment : Fragment() {
 
     private var _binding: FragmentGraficosBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var db: AppDatabase
-    private var dataInicioPersonalizada: Long = 0L
-    private var dataFimPersonalizada: Long = 0L
+    private val db by lazy { AppDatabase.getDatabase(requireContext()) }
+    private var dataInicioPersonalizada = 0L
+    private var dataFimPersonalizada = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -53,12 +47,14 @@ class GraficosFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        db = AppDatabase.getDatabase(requireContext())
+        inicializarGraficos()
+        configurarFiltros()
+    }
 
+    private fun inicializarGraficos() {
         configurarGraficoBarrasInicial()
         configurarGraficoLinhaInicial()
         configurarGraficoPizzaInicial()
-        configurarFiltros()
     }
 
     override fun onResume() {
@@ -70,33 +66,17 @@ class GraficosFragment : Fragment() {
 
     private fun configurarFiltros() {
         binding.chipGroupFiltrosGrafico.setOnCheckedStateChangeListener { _, checkedIds ->
-            if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
-            val chipId = checkedIds[0]
+            val chipId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
             if (chipId == R.id.chipPorPeriodoGrafico) abrirSeletorDeData()
             else carregarDadosGrafico(chipId)
         }
     }
 
-    private fun abrirSeletorDeData() {
-        val builder = MaterialDatePicker.Builder.dateRangePicker()
-        builder.setTitleText("Selecione o Período")
-        val picker = builder.build()
-
-        picker.addOnPositiveButtonClickListener { selection ->
-            dataInicioPersonalizada = selection.first ?: 0L
-            dataFimPersonalizada = selection.second ?: 0L
-            val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
-            binding.chipPorPeriodoGrafico.text = "${formato.format(Date(dataInicioPersonalizada))} - ${formato.format(Date(dataFimPersonalizada))}"
-            carregarDadosGrafico(R.id.chipPorPeriodoGrafico)
-        }
-        picker.show(parentFragmentManager, "DATE_PICKER_GRAFICOS")
-    }
-
     private fun carregarDadosGrafico(chipId: Int) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val (listaFiltrada, categorias, evolucaoSaldo) = withContext(Dispatchers.IO) {
+            val (lista, categorias, evolucao) = withContext(Dispatchers.IO) {
                 val cal = Calendar.getInstance()
-                val lista = when (chipId) {
+                val resultado = when (chipId) {
                     R.id.chipMesAtualGrafico -> {
                         cal.set(Calendar.DAY_OF_MONTH, 1)
                         db.orcamentoDao().listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
@@ -106,145 +86,104 @@ class GraficosFragment : Fragment() {
                         db.orcamentoDao().listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
                     }
                     R.id.chipPorPeriodoGrafico -> {
-                        db.orcamentoDao().listarLancamentosPorPeriodo(dataInicioPersonalizada, dataFimPersonalizada + 86400000)
+                        // Filtra exatamente entre as duas datas selecionadas
+                        db.orcamentoDao().listarLancamentosPorPeriodo(dataInicioPersonalizada, dataFimPersonalizada)
                     }
                     else -> db.orcamentoDao().listarLancamentosSemFlow()
-
                 }
-                val evolucao = db.orcamentoDao().obterEvolucaoSaldo().first()
-                Triple(lista, db.orcamentoDao().listarCategorias(), evolucao)
+                Triple(resultado, db.orcamentoDao().listarCategorias(), db.orcamentoDao().obterEvolucaoSaldo().first())
             }
 
-            if (_binding != null) {
-                atualizarResumo(listaFiltrada)
-                atualizarGraficoBarras(listaFiltrada)
-                atualizarGraficoPizza(listaFiltrada, categorias)
-                atualizarGraficoLinha(evolucaoSaldo)
+            _binding?.let {
+                atualizarResumo(lista)
+                atualizarGraficoBarras(lista)
+                atualizarGraficoPizza(lista, categorias)
+                atualizarGraficoLinha(evolucao)
             }
         }
     }
 
-    // --- GRÁFICO DE LINHA (EVOLUÇÃO MENSAL) ---
+    private fun abrirSeletorDeData() {
+        val builder = MaterialDatePicker.Builder.dateRangePicker()
+        builder.setTitleText("Filtrar Gráficos")
+        val picker = builder.build()
 
-    private fun configurarGraficoLinhaInicial() {
-        val corTexto = obterCorTextoBase()
-        binding.lineChart.apply {            description.isEnabled = false
-            setDrawGridBackground(false)
+        picker.addOnPositiveButtonClickListener { selection ->
+            val dataInicio = selection.first
+            val dataFim = selection.second
 
-            // Habilita interação para que o usuário veja os detalhes ao tocar
-            setTouchEnabled(true)
-            isDragEnabled = true
-            setScaleEnabled(true)
-            setPinchZoom(true)
+            if (dataInicio != null && dataFim != null) {
+                val offset = TimeZone.getDefault().getOffset(Date().time).toLong()
 
-            xAxis.apply {
-                position = XAxis.XAxisPosition.BOTTOM
-                textColor = corTexto
-                setDrawGridLines(false)
-                granularity = 1f
+                dataInicioPersonalizada = dataInicio + offset
+                dataFimPersonalizada = dataFim + offset + 86399999
+
+                val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
+                binding.chipPorPeriodoGrafico.text = "${formato.format(Date(dataInicioPersonalizada))} - ${formato.format(Date(dataFimPersonalizada))}"
+
+                carregarDadosGrafico(R.id.chipPorPeriodoGrafico)
             }
-            axisLeft.apply {
-                textColor = corTexto
-                setDrawGridLines(true)
-                gridColor = Color.LTGRAY
-            }
-            axisRight.isEnabled = false
-            legend.textColor = corTexto
         }
+
+        picker.addOnNegativeButtonClickListener { binding.chipMesAtualGrafico.isChecked = true }
+        picker.show(parentFragmentManager, "DATE_PICKER_GRAFICOS")
     }
+
+    // --- LOGICA DE ATUALIZAÇÃO DOS GRÁFICOS ---
+
     private fun atualizarGraficoLinha(dados: List<SaldoMensal>) {
-        if (dados.isEmpty()) {
-            binding.lineChart.clear()
-            return
-        }
+        if (dados.isEmpty()) { binding.lineChart.clear(); return }
 
         val entries = mutableListOf<Entry>()
-        val labels = mutableListOf<String>()
-        val coresDosCirculos = mutableListOf<Int>()
+        val labelsX = mutableListOf<String>()
+        val coresCirculos = mutableListOf<Int>()
 
         val corAzul = ContextCompat.getColor(requireContext(), R.color.blue_primary)
         val corVermelha = ContextCompat.getColor(requireContext(), R.color.red)
 
-        // Ordenar por data caso venha desordenado do banco
         val dadosOrdenados = dados.sortedBy { it.mesAno }
 
-        dadosOrdenados.forEachIndexed { index, saldoMensal ->
-            val valor = saldoMensal.saldo.toFloat()
-
-            // 1. Criar a entrada do gráfico (X é o índice, Y é o valor)
-            entries.add(Entry(index.toFloat(), valor))
-
-            // 2. Criar o rótulo formatado (Ex: Jan/24)
-            labels.add(formatarMesAno(saldoMensal.mesAno))
-
-            // 3. Definir a cor do ponto (Azul para positivo, Vermelho para negativo)
-            coresDosCirculos.add(if (valor >= 0) corAzul else corVermelha)
+        dadosOrdenados.forEachIndexed { index, item ->
+            entries.add(Entry(index.toFloat(), item.saldo.toFloat()))
+            labelsX.add(formatarMesAno(item.mesAno))
+            coresCirculos.add(if (item.saldo >= 0) corAzul else corVermelha)
         }
 
-        val dataSet = LineDataSet(entries, "Saldo Mensal (R$)").apply {
+        val dataSet = LineDataSet(entries, "Saldo Mensal").apply {
             color = corAzul
-            lineWidth = 3f
-
-            // UX Limpo: Esconde valores fixos (o MarkerView mostrará ao tocar)
-            setDrawValues(false)
-
-            setCircleColors(coresDosCirculos)
+            circleColors = coresCirculos
+            lineWidth = 2.5f
             circleRadius = 5f
-            setDrawCircleHole(true)
-            circleHoleColor = Color.WHITE
-
+            setDrawValues(false)
             setDrawFilled(true)
-            // Certifique-se que o drawable 'fade_blue' existe em res/drawable
             fillDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.fade_blue)
-            fillAlpha = 50
+            mode = LineDataSet.Mode.LINEAR
         }
 
         binding.lineChart.apply {
-            // Configura o marcador para exibir detalhes ao clicar no ponto
-            val mv = CustomMarkerView(requireContext(), R.layout.layout_marker_view)
-            mv.chartView = this
-            marker = mv
-
-            xAxis.valueFormatter = IndexAxisValueFormatter(labels)
+            marker = CustomMarkerView(requireContext(), R.layout.layout_marker_view).also { it.chartView = this }
+            xAxis.apply {
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        val index = value.toInt()
+                        return if (index >= 0 && index < labelsX.size) labelsX[index] else ""
+                    }
+                }
+                granularity = 1f
+                isGranularityEnabled = true
+                labelCount = if (labelsX.size > 5) 5 else labelsX.size
+            }
             data = LineData(dataSet)
-
-            // Linha de limite no Zero para facilitar visualização de dívidas
-            axisLeft.removeAllLimitLines()
-            val limitLine = LimitLine(0f, "")
-            limitLine.lineColor = Color.GRAY
-            limitLine.lineWidth = 1f
-            limitLine.enableDashedLine(10f, 10f, 0f)
-            axisLeft.addLimitLine(limitLine)
-
-            animateX(1000)
+            axisLeft.apply {
+                removeAllLimitLines()
+                addLimitLine(LimitLine(0f).apply {
+                    lineColor = Color.GRAY
+                    lineWidth = 1f
+                    enableDashedLine(10f, 10f, 0f)
+                })
+            }
+            animateX(800)
             invalidate()
-        }
-    }
-
-    private fun formatarMesAno(mesAno: String): String {
-        return try {
-            val original = SimpleDateFormat("yyyy-MM", Locale.US).parse(mesAno)
-            val formatador = SimpleDateFormat("MMM/yy", Locale("pt", "BR"))
-            formatador.format(original!!).replaceFirstChar { it.uppercase() }
-        } catch (e: Exception) {
-            mesAno
-        }
-    }
-
-    // --- GRÁFICOS EXISTENTES (BARRAS E PIZZA) ---
-
-    private fun configurarGraficoBarrasInicial() {
-        val corTexto = obterCorTextoBase()
-        binding.barChart.apply {
-            description.isEnabled = false
-            legend.isEnabled = false
-            xAxis.textColor = corTexto
-            xAxis.position = XAxis.XAxisPosition.BOTTOM
-            xAxis.setDrawGridLines(false)
-            xAxis.valueFormatter = IndexAxisValueFormatter(listOf("Receitas", "Despesas"))
-            axisRight.isEnabled = false
-            axisLeft.textColor = corTexto
-            axisLeft.axisMinimum = 0f
         }
     }
 
@@ -252,57 +191,140 @@ class GraficosFragment : Fragment() {
         val receitas = lista.filter { it.tipo == TipoLancamento.RECEITA }.sumOf { it.valor }.toFloat()
         val despesas = lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf { it.valor }.toFloat()
 
-        val dataSet = BarDataSet(listOf(BarEntry(0f, receitas), BarEntry(1f, despesas)), "Resumo").apply {
+        val dataSet = BarDataSet(listOf(BarEntry(0f, receitas), BarEntry(1f, despesas)), "").apply {
             colors = listOf(ContextCompat.getColor(requireContext(), R.color.green), ContextCompat.getColor(requireContext(), R.color.red))
+            valueFormatter = CurrencyFormatter()
             valueTextColor = obterCorTextoBase()
-            valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float) = NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(value.toDouble())
-            }
+            valueTextSize = 10f
         }
-        binding.barChart.data = BarData(dataSet).apply { barWidth = 0.5f }
-        binding.barChart.invalidate()
+
+        binding.barChart.apply {
+            data = BarData(dataSet).apply { barWidth = 0.5f }
+            animateY(800)
+            invalidate()
+        }
     }
 
     private fun atualizarGraficoPizza(lista: List<Lancamento>, categorias: List<Categoria>) {
-        val apenasDespesas = lista.filter { it.tipo == TipoLancamento.DESPESA }
-        if (apenasDespesas.isEmpty()) { binding.pieChart.clear(); return }
+        val despesas = lista.filter { it.tipo == TipoLancamento.DESPESA }
+        if (despesas.isEmpty()) { binding.pieChart.clear(); return }
 
-        val mapaCats = categorias.associate { it.id to it.nome }
-        val entries = apenasDespesas.groupBy { it.categoriaID }
-            .map { PieEntry(it.value.sumOf { l -> l.valor }.toFloat(), mapaCats[it.key] ?: "Outros") }
+        val mapaCats = categorias.associateBy({ it.id }, { it.nome })
+
+        val entries = despesas.groupBy { it.categoriaID }
+            .map { (catId, itens) ->
+                PieEntry(itens.sumOf { it.valor }.toFloat(), mapaCats[catId] ?: "Outras")
+            }
 
         val dataSet = PieDataSet(entries, "").apply {
-            colors = ColorTemplate.COLORFUL_COLORS.toList()
-            valueTextColor = obterCorTextoBase()
-            xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-            yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+            colors = ColorTemplate.MATERIAL_COLORS.toList()
             valueLineColor = obterCorTextoBase()
+            valueTextColor = obterCorTextoBase()
+            yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+            valueTextSize = 11f
+            sliceSpace = 3f
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return String.format("%.1f%%", value)
+                }
+            }
         }
-        binding.pieChart.data = PieData(dataSet)
-        binding.pieChart.invalidate()
+
+        binding.pieChart.apply {
+            data = PieData(dataSet)
+            setUsePercentValues(true)
+            animateXY(800, 800)
+            invalidate()
+        }
+    }
+
+    private fun configurarGraficoLinhaInicial() {
+        val cor = obterCorTextoBase()
+        binding.lineChart.apply {
+            description.isEnabled = false
+            setNoDataText("Aguardando dados...")
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                textColor = cor
+                setDrawGridLines(false)
+            }
+            axisLeft.textColor = cor
+            axisRight.isEnabled = false
+            legend.textColor = cor
+            setScaleEnabled(true)
+            setPinchZoom(true)
+        }
+    }
+
+    private fun configurarGraficoBarrasInicial() {
+        val cor = obterCorTextoBase()
+        binding.barChart.apply {
+            description.isEnabled = false
+            xAxis.apply {
+                textColor = cor
+                position = XAxis.XAxisPosition.BOTTOM
+                valueFormatter = object : ValueFormatter() {
+                    private val labels = listOf("Receitas", "Despesas")
+                    override fun getFormattedValue(value: Float): String {
+                        return labels.getOrNull(value.toInt()) ?: ""
+                    }
+                }
+                setDrawGridLines(false)
+                granularity = 1f
+            }
+            axisLeft.textColor = cor
+            axisRight.isEnabled = false
+            legend.isEnabled = false
+        }
     }
 
     private fun configurarGraficoPizzaInicial() {
         binding.pieChart.apply {
             description.isEnabled = false
             setHoleColor(Color.TRANSPARENT)
-            legend.textColor = obterCorTextoBase()
+            setCenterTextSize(14f)
+            legend.apply {
+                textColor = obterCorTextoBase()
+                isWordWrapEnabled = true
+                horizontalAlignment = com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER
+            }
             setEntryLabelColor(obterCorTextoBase())
         }
     }
 
     private fun atualizarResumo(lista: List<Lancamento>) {
-        val r = lista.filter { it.tipo == TipoLancamento.RECEITA }.sumOf { it.valor }
-        val d = lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf { it.valor }
-        val s = r - d
+        var receitas = 0.0
+        var despesas = 0.0
+        lista.forEach {
+            if (it.tipo == TipoLancamento.RECEITA) receitas += it.valor
+            else despesas += it.valor
+        }
+        val saldo = receitas - despesas
+
         val fmt = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
-        binding.txtTotalReceitasGrafico.text = fmt.format(r)
-        binding.txtTotalDespesasGrafico.text = fmt.format(d)
-        binding.txtSaldoFinalGrafico.text = fmt.format(s)
-        binding.txtSaldoFinalGrafico.setTextColor(ContextCompat.getColor(requireContext(), if (s >= 0) R.color.green else R.color.red))
+        with(binding) {
+            txtTotalReceitasGrafico.text = fmt.format(receitas)
+            txtTotalDespesasGrafico.text = fmt.format(despesas)
+            txtSaldoFinalGrafico.apply {
+                text = fmt.format(saldo)
+                setTextColor(ContextCompat.getColor(requireContext(), if (saldo >= 0) R.color.green else R.color.red))
+            }
+        }
     }
 
-    private fun obterCorTextoBase() = if (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES) Color.WHITE else Color.BLACK
+    private fun formatarMesAno(mesAno: String): String {
+        return try {
+            val date = SimpleDateFormat("yyyy-MM", Locale.US).parse(mesAno)
+            SimpleDateFormat("MMM/yy", Locale("pt", "BR")).format(date!!).replaceFirstChar { it.uppercase() }
+        } catch (e: Exception) { mesAno }
+    }
+
+    private fun obterCorTextoBase() = if (isDarkTheme()) Color.WHITE else Color.BLACK
+    private fun isDarkTheme() = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+    private class CurrencyFormatter : ValueFormatter() {
+        override fun getFormattedValue(value: Float) = NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(value.toDouble())
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

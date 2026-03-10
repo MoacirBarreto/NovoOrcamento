@@ -11,7 +11,8 @@
         android:id="@+id/txtTituloTela"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Novo Lançamento"
+        android:layout_marginTop="24dp"
+        android:text="@string/novo_lancamento"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:hint="Valor (R$)"
+        android:hint="@string/valor_RS"
         app:layout_constraintTop_toBottomOf="@id/txtTituloTela">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -40,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Tipo de Movimentação:"
+        android:text="@string/tipo_movimentacao"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tilValor" />
 
@@ -56,23 +57,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Despesa" />
+            android:text="@string/despesas" />
 
         <RadioButton
             android:id="@+id/rbReceita"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Receita" />
+            android:text="@string/receitas" />
     </RadioGroup>
 
     <!-- 3. Campo Data -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilData"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Data"
+        android:hint="@string/data"
         app:layout_constraintTop_toBottomOf="@id/radioGroupTipo">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -80,9 +82,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
-            android:drawableEnd="@android:drawable/ic_menu_my_calendar"
             android:focusable="false"
-            android:inputType="none" />
+            android:cursorVisible="false"
+            android:inputType="none"
+            android:drawableEnd="@drawable/ic_calendar" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- 4. Spinner Categoria -->
@@ -91,7 +94,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Categoria:"
+        android:text="@string/categoria"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tilData" />
 
@@ -109,7 +112,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Descrição / Complemento"
+        android:hint="@string/descr_complemento"
         app:layout_constraintTop_toBottomOf="@id/spinnerCategorias">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -135,14 +138,14 @@
             android:id="@+id/chkRepetir"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Repetir lançamento?" />
+            android:text="@string/repetir_lancamento" />
 
         <EditText
             android:id="@+id/edtQtdMeses"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:hint="Ex: 3"
+            android:hint="@string/ex_3"
             android:inputType="number"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -152,7 +155,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="meses"
+            android:text="@string/meses"
             android:visibility="gone"
             tools:visibility="visible" />
     </LinearLayout>
@@ -164,7 +167,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:padding="12dp"
-        android:text="SALVAR"
+        android:text="@string/salvar"
         app:layout_constraintTop_toBottomOf="@id/containerRepetir"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

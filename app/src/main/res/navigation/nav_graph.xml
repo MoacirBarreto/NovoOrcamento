@@ -26,7 +26,7 @@
 
     <fragment
         android:id="@+id/action_personalizar"
-        android:name="devandroid.moacir.novoorcamento.PersonalizacaoFragment"
+        android:name="devandroid.moacir.novoorcamento.PersonFragment"
         android:label="Personalizar"
         tools:layout="@layout/fragment_personalizacao" />
 

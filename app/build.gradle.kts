@@ -52,14 +52,6 @@ android {
 
 dependencies {
 
-    // --- Bibliotecas do Google / Android ---
-    // Nota: Leanback é geralmente para TV. Se for só celular, pode remover.
-    implementation(libs.androidx.leanback)
-
-    // CORREÇÃO: Usando versão 3.3.0 para evitar erro de compatibilidade com Kotlin
-    // Se não usar mapas/lugares, pode remover esta linha inteira.
-    implementation("com.google.android.libraries.places:places:3.3.0")
-
     // Desugaring (para usar APIs novas do Java em Androids antigos)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 

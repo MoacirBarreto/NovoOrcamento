@@ -43,7 +43,7 @@ interface OrcamentoDao {
     suspend fun listarLancamentosPorPeriodo(inicio: Long, fim: Long): List<Lancamento>
 
     @Transaction
-    @androidx.room.Upsert
+    @Upsert
     suspend fun upsertCategoria(categoria: Categoria)
 
     @Transaction
@@ -67,6 +67,21 @@ interface OrcamentoDao {
     ORDER BY mesAno ASC
 """)
     fun obterEvolucaoSaldo(): Flow<List<SaldoMensal>>
+
+    @Query("""
+    SELECT 
+        SUM(CASE WHEN tipo = 'RECEITA' THEN valor ELSE 0 END) as receitas,
+        SUM(CASE WHEN tipo = 'DESPESA' THEN valor ELSE 0 END) as despesas
+    FROM lancamentos 
+    WHERE data BETWEEN :inicio AND :fim
+""")
+    suspend fun obterResumoFinanceiro(inicio: Long, fim: Long): ResumoFinanceiro
+
+    // Classe de suporte para o retorno acima (pode colocar no mesmo arquivo do DAO)
+    data class ResumoFinanceiro(val receitas: Double, val despesas: Double)
+
+    @Query("SELECT * FROM lancamentos WHERE id = :id")
+    suspend fun buscarPorId(id: Int): Lancamento?
 
 }
 

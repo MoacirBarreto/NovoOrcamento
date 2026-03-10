@@ -52,6 +52,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        // Ao voltar para a tela, verifica qual filtro está ativo e recarrega
         val chipId = binding.chipGroupFiltros.checkedChipId
         if (chipId == View.NO_ID) {
             binding.chipMesAtual.isChecked = true
@@ -59,9 +60,11 @@ class HomeFragment : Fragment() {
             carregarLista(chipId)
         }
     }
+
     private fun configurarRecyclerView() {
         binding.rvLancamentos.layoutManager = LinearLayoutManager(requireContext())
     }
+
     private fun configurarFab() {
         binding.fabAdicionar.setOnClickListener {
             val intent = Intent(requireContext(), NovoLancamentoActivity::class.java)
@@ -83,6 +86,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun abrirSeletorDeData() {
+        // Cria o seletor de intervalo (Range) profissional
         val builder = MaterialDatePicker.Builder.dateRangePicker()
         builder.setTitleText("Selecione o Período")
         val picker = builder.build()
@@ -92,19 +96,23 @@ class HomeFragment : Fragment() {
             val dataFim = selection.second
 
             if (dataInicio != null && dataFim != null) {
-                dataInicioPersonalizada = dataInicio
-                dataFimPersonalizada = dataFim
-
-                val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
+                // CORREÇÃO DE FUSO HORÁRIO: O MaterialDatePicker trabalha em UTC.
+                // Somamos o offset local para que a data exibida seja a mesma que o usuário clicou.
                 val offset = TimeZone.getDefault().getOffset(Date().time).toLong()
 
-                binding.chipPorPeriodo.text =
-                    "${formato.format(Date(dataInicio + offset))} - ${formato.format(Date(dataFim + offset))}"
+                dataInicioPersonalizada = dataInicio + offset
+                // O fim do período deve ir até o último segundo do dia escolhido
+                dataFimPersonalizada = dataFim + offset + 86399999
+
+                val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
+                binding.chipPorPeriodo.text = "${formato.format(Date(dataInicioPersonalizada))} - ${formato.format(Date(dataFimPersonalizada))}"
+
                 carregarLista(R.id.chipPorPeriodo)
             }
         }
+
         picker.addOnNegativeButtonClickListener { binding.chipMesAtual.isChecked = true }
-        picker.show(parentFragmentManager, "DATE_PICKER")
+        picker.show(parentFragmentManager, "DATE_PICKER_HOME")
     }
 
     private fun carregarLista(chipId: Int) {
@@ -115,15 +123,12 @@ class HomeFragment : Fragment() {
             calendario.set(Calendar.SECOND, 0)
             calendario.set(Calendar.MILLISECOND, 0)
 
-            // Explicitly cast the result to List<Lancamento>
-            // Dentro de carregarLista(chipId: Int)
             val listaFiltrada = withContext(Dispatchers.IO) {
-                val agora = Calendar.getInstance().timeInMillis // Data/Hora exata de agora
+                val agora = Calendar.getInstance().timeInMillis
 
                 when (chipId) {
                     R.id.chipMesAtual -> {
                         calendario.set(Calendar.DAY_OF_MONTH, 1)
-                        // Do dia 1º às 00:00 até Agora
                         db.orcamentoDao().listarLancamentosPorPeriodo(calendario.timeInMillis, agora)
                     }
 
@@ -133,23 +138,23 @@ class HomeFragment : Fragment() {
                         cal30.set(Calendar.HOUR_OF_DAY, 0)
                         cal30.set(Calendar.MINUTE, 0)
                         cal30.set(Calendar.SECOND, 0)
-                        // De 30 dias atrás às 00:00 até Agora
                         db.orcamentoDao().listarLancamentosPorPeriodo(cal30.timeInMillis, agora)
                     }
 
                     R.id.chipPorPeriodo -> {
-                        // Garante que o fim do período inclua o dia inteiro (soma 23h 59min)
+                        // Soma 86399999ms para pegar até o último milissegundo do dia final
                         db.orcamentoDao().listarLancamentosPorPeriodo(
                             dataInicioPersonalizada,
-                            dataFimPersonalizada + 86399999
+                            dataFimPersonalizada
                         )
                     }
 
-                    else -> db.orcamentoDao().listarLancamentos()
+                    else -> db.orcamentoDao().listarLancamentosSemFlow()
                 }
-            } as List<Lancamento>
+            }
 
             if (chipId != R.id.chipPorPeriodo) binding.chipPorPeriodo.text = "Por Período"
+
             atualizarRecyclerView(listaFiltrada)
             atualizarResumo(listaFiltrada)
         }
@@ -169,10 +174,12 @@ class HomeFragment : Fragment() {
         val saldo = totalReceitas - totalDespesas
 
         val formato = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+
         binding.txtTotalReceitas.text = formato.format(totalReceitas)
         binding.txtTotalDespesas.text = formato.format(totalDespesas)
         binding.txtSaldoFinal.text = formato.format(saldo)
 
+        // Define a cor do saldo (Verde para positivo, Vermelho para negativo)
         val cor = if (saldo >= 0) R.color.green else R.color.red
         binding.txtSaldoFinal.setTextColor(ContextCompat.getColor(requireContext(), cor))
     }
@@ -188,12 +195,12 @@ class HomeFragment : Fragment() {
             .setTitle("Excluir Lançamento")
             .setMessage("Deseja excluir '${lancamento.descricao}'?")
             .setPositiveButton("Sim") { _, _ ->
-                // Exclusão assíncrona
                 viewLifecycleOwner.lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         db.orcamentoDao().deletarLancamento(lancamento)
                     }
                     Toast.makeText(requireContext(), "Excluído!", Toast.LENGTH_SHORT).show()
+                    // Recarrega a lista mantendo o filtro atual
                     carregarLista(binding.chipGroupFiltros.checkedChipId)
                 }
             }

@@ -39,27 +39,29 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        private val DatabaseCallback = object : RoomDatabase.Callback() {
+        // Dentro do AppDatabase.kt
+        private val DatabaseCallback = object : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-                // Usamos o INSTANCE garantido após o build
                 INSTANCE?.let { database ->
                     CoroutineScope(Dispatchers.IO).launch {
-                        prepopularCategorias(database.orcamentoDao())
+                        val dao = database.orcamentoDao()
+
+                        // Lista explícita com IDs para garantir a ordem no primeiro acesso
+                        val categoriasIniciais = listOf(
+                            Categoria(id = 1, nome = "Receita"),
+                            Categoria(id = 2, nome = "Alimentação"),
+                            Categoria(id = 3, nome = "Casa"),
+                            Categoria(id = 4, nome = "Lazer"),
+                            Categoria(id = 5, nome = "Transporte"),
+                            Categoria(id = 6, nome = "Outros")
+                        )
+
+                        categoriasIniciais.forEach {
+                            dao.upsertCategoria(it)
+                        }
                     }
                 }
-            }
-
-            private suspend fun prepopularCategorias(dao: OrcamentoDao) {
-                val list = listOf(
-                    Categoria(id = 1, nome = "Receita"),
-                    Categoria(id = 2, nome = "Alimentação"),
-                    Categoria(id = 3, nome = "Casa"),
-                    Categoria(id = 4, nome = "Lazer"),
-                    Categoria(id = 5, nome = "Transporte"),
-                    Categoria(id = 6, nome = "Outros")
-                )
-                list.forEach { dao.upsertCategoria(it) }
             }
         }
     }
