@@ -5,12 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import devandroid.moacir.novoorcamento.model.Agenda
 import devandroid.moacir.novoorcamento.model.Categoria
 import devandroid.moacir.novoorcamento.model.Lancamento
-import devandroid.moacir.novoorcamento.model.Agenda
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Database(
     entities = [Categoria::class, Lancamento::class, Agenda::class],
@@ -40,28 +37,16 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         // Dentro do AppDatabase.kt
+        // Dentro do seu AppDatabase.kt
         private val DatabaseCallback = object : Callback() {
-            override fun onCreate(db: SupportSQLiteDatabase) {
-                super.onCreate(db)
-                INSTANCE?.let { database ->
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val dao = database.orcamentoDao()
-
-                        // Lista explícita com IDs para garantir a ordem no primeiro acesso
-                        val categoriasIniciais = listOf(
-                            Categoria(id = 1, nome = "Receita"),
-                            Categoria(id = 2, nome = "Alimentação"),
-                            Categoria(id = 3, nome = "Casa"),
-                            Categoria(id = 4, nome = "Lazer"),
-                            Categoria(id = 5, nome = "Transporte"),
-                            Categoria(id = 6, nome = "Outros")
-                        )
-
-                        categoriasIniciais.forEach {
-                            dao.upsertCategoria(it)
-                        }
-                    }
-                }
+            override fun onCreate(db: SupportSQLiteDatabase) {super.onCreate(db)
+                // Usar transação SQL direta no 'db' fornecido pelo onCreate é mais seguro
+                db.execSQL("INSERT INTO categorias (id, nome) VALUES (1, 'Receita')")
+                db.execSQL("INSERT INTO categorias (id, nome) VALUES (2, 'Alimentação')")
+                db.execSQL("INSERT INTO categorias (id, nome) VALUES (3, 'Casa')")
+                db.execSQL("INSERT INTO categorias (id, nome) VALUES (4, 'Lazer')")
+                db.execSQL("INSERT INTO categorias (id, nome) VALUES (5, 'Transporte')")
+                db.execSQL("INSERT INTO categorias (id, nome) VALUES (6, 'Outros')")
             }
         }
     }

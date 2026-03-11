@@ -4,5 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="green">#4CAF50</color>
     <color name="red">#F44336</color>
-    <color name="blue_primary">#2196F3</color>
+    <color name="blue_primary">#6366F1</color>
+    <color name="blue_secondary">#0F172A </color>
+    <color name="gold">#F59E0B </color>
 </resources>

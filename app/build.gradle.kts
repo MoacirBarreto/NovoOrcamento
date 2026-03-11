@@ -52,6 +52,7 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.material3)
     // Desugaring (para usar APIs novas do Java em Androids antigos)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 

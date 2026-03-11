@@ -1,6 +1,5 @@
 package devandroid.moacir.novoorcamento
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -22,7 +21,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
 
 class NovoLancamentoActivity : AppCompatActivity() {
 

@@ -11,7 +11,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -27,7 +35,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class GraficosFragment : Fragment() {
 
@@ -114,6 +125,7 @@ class GraficosFragment : Fragment() {
 
             if (dataInicio != null && dataFim != null) {
                 val offset = TimeZone.getDefault().getOffset(Date().time).toLong()
+
 
                 dataInicioPersonalizada = dataInicio + offset
                 dataFimPersonalizada = dataFim + offset + 86399999

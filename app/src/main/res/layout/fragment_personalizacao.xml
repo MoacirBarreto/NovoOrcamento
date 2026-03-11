@@ -92,6 +92,12 @@
             android:text="@string/salvar_categorias" />
 
         <Button
+            android:id="@+id/btnResetCategorias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/reiniciar_categ" />
+
+        <Button
             android:id="@+id/btnResetBoasVindas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

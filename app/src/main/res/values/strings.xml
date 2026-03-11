@@ -45,4 +45,9 @@
     <string name="voce_manda">Aqui você manda no seu dinheiro. Olha como é fácil:</string>
     <string name="bem_vindo">Bem-vindo ao NovoOrçamento! 🚀</string>
     <string name="importante">IMPORTANTE: Seus dados são valiosos e protegidos por lei. Não compartilhe com terceiros. No NovoOrcamento, eles não saem do seu dispositivo. São gravados no banco de dados interno do aplicativo.</string>
+    <string name="reiniciar_categ">Reiniciar Categorias Para Padrão</string>
+    <string name="agenda">Agenda</string>
+    <string name="inicio">Início</string>
+    <string name="graficos">Gráficos</string>
+    <string name="personalizar">Personalizar</string>
 </resources>
