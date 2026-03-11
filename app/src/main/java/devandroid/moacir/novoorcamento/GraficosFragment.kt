@@ -1,4 +1,4 @@
-package devandroid.moacir.novoorcamento
+package devandroid.moacir.Lume
 
 import android.content.pm.ActivityInfo
 import android.graphics.Color
@@ -23,12 +23,12 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.datepicker.MaterialDatePicker
-import devandroid.moacir.novoorcamento.database.AppDatabase
-import devandroid.moacir.novoorcamento.databinding.FragmentGraficosBinding
-import devandroid.moacir.novoorcamento.model.Categoria
-import devandroid.moacir.novoorcamento.model.Lancamento
-import devandroid.moacir.novoorcamento.model.SaldoMensal
-import devandroid.moacir.novoorcamento.model.TipoLancamento
+import devandroid.moacir.Lume.database.AppDatabase
+import devandroid.moacir.Lume.databinding.FragmentGraficosBinding
+import devandroid.moacir.Lume.model.Categoria
+import devandroid.moacir.Lume.model.Lancamento
+import devandroid.moacir.Lume.model.SaldoMensal
+import devandroid.moacir.Lume.model.TipoLancamento
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

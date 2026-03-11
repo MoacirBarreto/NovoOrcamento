@@ -1,4 +1,4 @@
-package devandroid.moacir.novoorcamento
+package devandroid.moacir.Lume
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,10 +10,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import devandroid.moacir.novoorcamento.database.AppDatabase
-import devandroid.moacir.novoorcamento.databinding.FragmentAgendaBinding
-import devandroid.moacir.novoorcamento.model.Agenda
-import devandroid.moacir.novoorcamento.model.Lancamento
+import devandroid.moacir.Lume.database.AppDatabase
+import devandroid.moacir.Lume.databinding.FragmentAgendaBinding
+import devandroid.moacir.Lume.model.Agenda
+import devandroid.moacir.Lume.model.Lancamento
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

@@ -1,10 +1,10 @@
-package devandroid.moacir.novoorcamento.database
+package devandroid.moacir.Lume.database
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import devandroid.moacir.novoorcamento.model.Agenda
+import devandroid.moacir.Lume.model.Agenda
 import kotlinx.coroutines.flow.Flow
 
 @Dao

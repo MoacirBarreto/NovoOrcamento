@@ -1,4 +1,4 @@
-package devandroid.moacir.novoorcamento.database
+package devandroid.moacir.Lume.database
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -7,9 +7,9 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
-import devandroid.moacir.novoorcamento.model.Categoria
-import devandroid.moacir.novoorcamento.model.Lancamento
-import devandroid.moacir.novoorcamento.model.SaldoMensal
+import devandroid.moacir.Lume.model.Categoria
+import devandroid.moacir.Lume.model.Lancamento
+import devandroid.moacir.Lume.model.SaldoMensal
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,4 +1,4 @@
-package devandroid.moacir.novoorcamento
+package devandroid.moacir.Lume
 
 import android.content.Context
 import android.os.Bundle
@@ -12,9 +12,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
-import devandroid.moacir.novoorcamento.database.AppDatabase
-import devandroid.moacir.novoorcamento.databinding.FragmentPersonalizacaoBinding
-import devandroid.moacir.novoorcamento.model.Categoria
+import devandroid.moacir.Lume.database.AppDatabase
+import devandroid.moacir.Lume.databinding.FragmentPersonalizacaoBinding
+import devandroid.moacir.Lume.model.Categoria
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
