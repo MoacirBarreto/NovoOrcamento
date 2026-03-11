@@ -39,5 +39,5 @@ dependencyResolutionManagement {
 }
 
 
-rootProject.name = "NovoOrcamento"
+rootProject.name = "Lume"
 include(":app")

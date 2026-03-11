@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Novo Orcamento</string>
+    <string name="app_name">Lume - Luz no seu Dinheiro</string>
     <string name="por_periodo">Por Período</string>
     <string name="mes_atual">Mês Atual</string>
     <string name="ultimos_30_dias">Últimos 30 dias</string>
@@ -43,11 +43,12 @@
     <string name="agenda_planeje_o_futuro">🗓️ Agenda: Planeje o futuro! Quando o boleto for pago, use o botão \'Confirmar\' para ele virar um Lançamento automático.</string>
     <string name="lancamentos_clique">💰 Lançamentos: Clique no (+) para criar. Toque rápido para editar e segure firme para excluir.</string>
     <string name="voce_manda">Aqui você manda no seu dinheiro. Olha como é fácil:</string>
-    <string name="bem_vindo">Bem-vindo ao NovoOrçamento! 🚀</string>
-    <string name="importante">IMPORTANTE: Seus dados são valiosos e protegidos por lei. Não compartilhe com terceiros. No NovoOrcamento, eles não saem do seu dispositivo. São gravados no banco de dados interno do aplicativo.</string>
+    <string name="bem_vindo">🔥 Bem-vindo ao Lume!</string>
+    <string name="importante">📢 IMPORTANTE: Seus dados são valiosos e protegidos por lei. Não compartilhe com terceiros. No Lume, eles não saem do seu dispositivo. São gravados no banco de dados interno do aplicativo.</string>
     <string name="reiniciar_categ">Reiniciar Categorias Para Padrão</string>
     <string name="agenda">Agenda</string>
     <string name="inicio">Início</string>
     <string name="graficos">Gráficos</string>
     <string name="personalizar">Personalizar</string>
+    <string name="planeje">Planeje. Acompanhe. Evolua!</string>
 </resources>

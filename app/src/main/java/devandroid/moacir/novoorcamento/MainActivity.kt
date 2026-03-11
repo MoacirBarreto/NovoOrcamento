@@ -1,4 +1,4 @@
-package devandroid.moacir.novoorcamento
+package devandroid.moacir.Lume
 
 import android.os.Bundle
 import android.widget.Button
@@ -7,7 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import devandroid.moacir.novoorcamento.databinding.ActivityMainBinding
+import devandroid.moacir.Lume.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,49 +15,62 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Inicializa o ViewBinding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Configuração do Navigation Component (Navegação entre Home, Gráficos, etc)
+        // Configuração do Navigation Component
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.fragmentContainer) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // Vincula a BottomNavigation com o NavController
+        // Vincula a BottomNavigation com o NavController (Gerencia as trocas de tela)
         NavigationUI.setupWithNavController(binding.bottomNavigation, navController)
 
-        // CHAMA A TELA DE BOAS-VINDAS
+        // Executa a verificação das boas-vindas após a interface carregar
         verificarBoasVindas()
     }
 
     /**
-     * Verifica se deve exibir as instruções de uso.
-     * A tela só aparece na primeira vez ou se o usuário resetar nas configurações.
+     * Verifica no SharedPreferences se a tela de introdução deve ser exibida.
      */
     private fun verificarBoasVindas() {
         val prefs = getSharedPreferences("config_prefs", MODE_PRIVATE)
         val exibirBoasVindas = prefs.getBoolean("exibir_boas_vindas", true)
 
         if (exibirBoasVindas) {
-            val dialogView = layoutInflater.inflate(R.layout.dialog_welcome, null)
-            val dialog = AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setCancelable(false) // Impede fechar clicando fora
-                .create()
-
-            // Referências dos componentes do layout XML
-            val chk = dialogView.findViewById<CheckBox>(R.id.chkNaoMostrarNovamente)
-            val btn = dialogView.findViewById<Button>(R.id.btnEntendido)
-
-            btn.setOnClickListener {
-                // Se o usuário marcou o checkbox, salvamos que ele não quer mais ver a tela
-                if (chk.isChecked) {
-                    prefs.edit().putBoolean("exibir_boas_vindas", false).apply()
-                }
-                dialog.dismiss()
-            }
-
-            dialog.show()
+            exibirDialogoBoasVindas(prefs)
         }
+    }
+
+    /**
+     * Infla e configura o diálogo customizado com o tema Lume.
+     */
+    private fun exibirDialogoBoasVindas(prefs: android.content.SharedPreferences) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_welcome, null)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false) // Força o usuário a clicar no botão para entrar
+            .create()
+
+        // IMPORTANTE: Remove o fundo padrão do AlertDialog para permitir que os
+        // cantos arredondados e o gradiente do seu XML apareçam corretamente.
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        // Referências dos componentes internos do layout XML
+        val chkNaoMostrar = dialogView.findViewById<CheckBox>(R.id.chkNaoMostrarNovamente)
+        val btnEntendido = dialogView.findViewById<Button>(R.id.btnEntendido)
+
+        btnEntendido.setOnClickListener {
+            // Se o CheckBox estiver marcado, salva a preferência para não mostrar mais
+            if (chkNaoMostrar.isChecked) {
+                prefs.edit().putBoolean("exibir_boas_vindas", false).apply()
+            }
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }

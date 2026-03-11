@@ -10,11 +10,11 @@ plugins {
 //}
 
 android {
-    namespace = "devandroid.moacir.novoorcamento"
+    namespace = "devandroid.moacir.Lume"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "devandroid.moacir.novoorcamento"
+        applicationId = "devandroid.moacir.Lume"
         minSdk = 29
         targetSdk = 35
         versionCode = 1
