@@ -12,31 +12,32 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- TÍTULO: Agora com cor marrom escuro para combinar com o dourado -->
+        <!-- TÍTULO PRINCIPAL -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/bem_vindo"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#3E2723"
+            android:textColor="@color/lume_text_title"
             android:layout_gravity="center"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="4dp" />
+        <!-- SUBTÍTULO (Slogan): Menor e com menos peso para dar elegância -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/planeje"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="#3E2723"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:textColor="@color/lume_text_body"
             android:layout_gravity="center"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="24dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/voce_manda"
-            android:textColor="#4E342E"
+            android:textColor="@color/lume_text_title"
             android:textSize="16sp"
             android:layout_marginBottom="16dp" />
 
@@ -45,14 +46,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/lancamentos_clique"
-            android:textColor="#5D4037"
+            android:textColor="@color/lume_text_body"
             android:layout_marginBottom="10dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/agenda_planeje_o_futuro"
-            android:textColor="#5D4037"
+            android:textColor="@color/lume_text_body"
             android:layout_marginBottom="16dp" />
 
         <!-- AVISO DE ATENÇÃO: Vermelho mais suave para não ser agressivo -->
@@ -60,7 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/atencao"
-            android:textColor="#B71C1C"
+            android:textColor="@color/lume_error"
             android:textStyle="italic"
             android:textSize="14sp"
             android:layout_marginBottom="20dp" />
@@ -70,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/importante"
-            android:textColor="#1A237E"
+            android:textColor="@color/lume_important"
             android:textStyle="bold"
             android:textSize="15sp"
             android:layout_marginBottom="24dp" />
@@ -87,8 +88,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/entendi_tudo"
-            android:textColor="#3E2723"
-            android:buttonTint="#FFA000" />
+            android:textColor="@color/lume_marrom"
+            android:buttonTint="@color/lume_text_body" />
 
         <!-- BOTÃO PRINCIPAL: Agora com margem superior maior para destaque -->
         <Button
@@ -99,7 +100,7 @@
             android:textSize="16sp"
             android:textAllCaps="true"
             android:textStyle="bold"
-            android:backgroundTint="#FF6F00"
+            android:backgroundTint="@color/lume_primary_variant"
             android:textColor="@android:color/white"
             android:layout_marginTop="20dp" />
 

@@ -5,6 +5,25 @@
     <color name="green">#4CAF50</color>
     <color name="red">#F44336</color>
     <color name="blue_primary">#6366F1</color>
-    <color name="blue_secondary">#0F172A </color>
-    <color name="gold">#F59E0B </color>
+    <color name="blue_secondary">#0F172A</color>
+    <color name="gold">#F59E0B</color>
+
+    <!-- Tons de Marca (Fogo/Luz) -->
+    <color name="lume_primary">#FF9800</color>       <!-- Laranja Vibrante -->
+    <color name="lume_primary_variant">#E65100</color> <!-- Laranja Queimado -->
+    <color name="lume_accent">#FFC107</color>        <!-- Ouro/Âmbar -->
+
+    <!-- Tons de Fundo (Calor/Suavidade) -->
+    <color name="lume_bg_warm">#FFFDE7</color>       <!-- Creme muito suave -->
+    <color name="lume_bg_gradient_end">#F9F1D7</color> <!-- Areia suave -->
+
+    <!-- Tons de Texto (Hierarquia) -->
+    <color name="lume_text_title">#3E2723</color>    <!-- Marrom Café (Substitui o Preto) -->
+    <color name="lume_text_body">#5D4037</color>     <!-- Marrom Médio -->
+    <color name="lume_text_light">#8D6E63</color>    <!-- Marrom Suave -->
+
+    <!-- Cores de Estado -->
+    <color name="lume_error">#B71C1C</color>         <!-- Vermelho Alerta -->
+    <color name="lume_important">#1A237E</color>     <!-- Azul Marinho para Destaque -->
+    <color name="lume_marrom">#3E2723</color>     <!-- Azul Marinho para Destaque -->
 </resources>

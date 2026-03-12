@@ -1,9 +1,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Lume" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+    <style name="Theme.Lume" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Cor dos Botões e Elementos Ativos -->
+        <item name="colorPrimary">@color/lume_primary</item>
+        <item name="colorOnPrimary">@android:color/white</item>
 
-    <style name="Theme.Lume" parent="Base.Theme.Lume" />
+        <!-- Cor de fundo de todas as Activitys -->
+        <item name="android:windowBackground">@color/lume_bg_warm</item>
+
+        <!-- Cor da Barra de Navegação Inferior (BottomNav) -->
+        <item name="colorSecondaryContainer">@color/lume_accent</item>
+        <item name="colorOnSecondaryContainer">@color/lume_text_title</item>
+
+        <!-- Cor da Barra de Status (Topo) -->
+        <item name="android:statusBarColor">@color/lume_bg_warm</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 </resources>

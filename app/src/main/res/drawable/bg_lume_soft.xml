@@ -6,7 +6,7 @@
         android:gradientRadius="400dp"
         android:centerX="0.5"
         android:centerY="0.3"
-        android:startColor="#FFF9E6"
-        android:endColor="#F2E1B5" />
+        android:startColor="@color/lume_bg_warm"
+        android:endColor="@color/lume_bg_gradient_end" />
     <corners android:radius="16dp" />
 </shape>
