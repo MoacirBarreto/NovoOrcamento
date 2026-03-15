@@ -17,6 +17,8 @@ import devandroid.moacir.Lume.model.Lancamento
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.NumberFormat // Correção: Import correto para Java/Android
+import java.util.* // Correção: Import para Locale e Calendar
 
 class AgendaFragment : Fragment() {
 
@@ -35,6 +37,10 @@ class AgendaFragment : Fragment() {
 
         binding.rvAgenda.layoutManager = LinearLayoutManager(requireContext())
 
+        // 1. CHAMADA DO ALERTA AUTOMÁTICO
+        configurarAlertaVencimentos()
+
+        // 2. CARREGAR LISTA DA AGENDA
         viewLifecycleOwner.lifecycleScope.launch {
             db.agendaDao().listarAgenda().collect { lista ->
                 if (lista.isEmpty()) {
@@ -49,7 +55,6 @@ class AgendaFragment : Fragment() {
                         onConfirmarClick = { item -> confirmarLancamento(item) },
                         onDeleteClick = { item -> excluirDaAgenda(item) },
                         onItemClick = { item ->
-                            // Abre a tela de edição
                             val intent = Intent(requireContext(), NovoLancamentoActivity::class.java)
                             intent.putExtra("IS_AGENDA", true)
                             intent.putExtra("LANCAMENTO_ID", item.id)
@@ -67,6 +72,41 @@ class AgendaFragment : Fragment() {
         }
     }
 
+    private fun configurarAlertaVencimentos() {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        val hoje = cal.timeInMillis
+
+        cal.add(Calendar.DAY_OF_YEAR, 7)
+        cal.set(Calendar.HOUR_OF_DAY, 23)
+        cal.set(Calendar.MINUTE, 59)
+        val proximaSemana = cal.timeInMillis
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Observa os vencimentos no banco de dados
+            db.orcamentoDao().listarVencimentosProximos(hoje, proximaSemana).collect { lista ->
+                if (lista.isNotEmpty()) {
+                    val totalValor = lista.sumOf { it.valor }
+                    val qtd = lista.size
+
+                    binding.cardAlertaVencimento.visibility = View.VISIBLE
+                    binding.txtMensagemAlerta.text = if (qtd == 1) {
+                        "Existe 1 conta próxima ao vencimento."
+                    } else {
+                        "Existem $qtd contas próximas totalizando ${formatarMoeda(totalValor)}"
+                    }
+                } else {
+                    binding.cardAlertaVencimento.visibility = View.GONE
+                }
+            }
+        }
+
+        binding.btnFecharAlerta.setOnClickListener {
+            binding.cardAlertaVencimento.visibility = View.GONE
+        }
+    }
+
     private fun confirmarLancamento(agenda: Agenda) {
         AlertDialog.Builder(requireContext())
             .setTitle("Confirmar Lançamento")
@@ -74,17 +114,14 @@ class AgendaFragment : Fragment() {
             .setPositiveButton("Sim") { _, _ ->
                 viewLifecycleOwner.lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
-                        // 1. Criar lançamento real
                         val novoLancamento = Lancamento(
                             descricao = agenda.descricao,
                             valor = agenda.valor,
-                            data = System.currentTimeMillis(), // Data de hoje
+                            data = System.currentTimeMillis(),
                             categoriaID = agenda.categoriaID,
                             tipo = agenda.tipo
                         )
                         db.orcamentoDao().upsertLancamento(novoLancamento)
-
-                        // 2. Remover da agenda
                         db.agendaDao().deletarAgenda(agenda)
                     }
                     Toast.makeText(context, "Lançado com sucesso!", Toast.LENGTH_SHORT).show()
@@ -105,6 +142,10 @@ class AgendaFragment : Fragment() {
             }
             .setNegativeButton("Cancelar", null)
             .show()
+    }
+
+    private fun formatarMoeda(valor: Double): String {
+        return NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(valor)
     }
 
     override fun onDestroyView() {

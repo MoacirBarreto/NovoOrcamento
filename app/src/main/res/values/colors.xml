@@ -4,7 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="green">#4CAF50</color>
     <color name="red">#F44336</color>
-    <color name="blue_primary">#6366F1</color>
+    <color name="blue_primary">#060AB1</color>
     <color name="blue_secondary">#0F172A</color>
     <color name="gold">#F59E0B</color>
 
@@ -15,7 +15,8 @@
 
     <!-- Tons de Fundo (Calor/Suavidade) -->
     <color name="lume_bg_warm">#FFFDE7</color>       <!-- Creme muito suave -->
-    <color name="lume_bg_gradient_end">#F9F1D7</color> <!-- Areia suave -->
+    <color name="lume_bg_gradient_end">#FBD765</color> <!-- Areia suave
+    <color name="lume_bg_gradient_end">#E6D7A8</color>  Areia suave -->
 
     <!-- Tons de Texto (Hierarquia) -->
     <color name="lume_text_title">#3E2723</color>    <!-- Marrom Café (Substitui o Preto) -->

@@ -31,7 +31,7 @@
     <string name="meses">meses</string>
     <string name="salvar">SALVAR</string>
     <string name="confirmar_pagamento">Confirmar Pagamento</string>
-    <string name="minha_agenda">Minha Agenda</string>
+    <string name="minha_agenda">Agenda Financeira</string>
     <string name="sem_agendamentos">Sem Agendamentos Previstos</string>
     <string name="todo">TODO</string>
     <string name="receitas_e_despesas">Receitas e Despesas</string>
@@ -51,4 +51,10 @@
     <string name="graficos">Gráficos</string>
     <string name="personalizar">Personalizar</string>
     <string name="planeje">Ilumine🔥 Planeje 📐 Evolua 🚀</string>
+    <string name="contato_suporte">Suporte e Sugestões</string>
+    <string name="email_contato">lumeapp.0212@gmail.com</string>
+    <string name="assunto_email">Feedback App Lume</string>
+    <string name="contas_a_vencer">Contas a vencer nos próximos 7 dias</string>
+    <string name="nenhuma_conta_proxima">Tudo em dia para os próximos 7 dias! 🎉</string>
+    <string name="alerta_vencimento">Atenção ao vencimento!</string>
 </resources>
