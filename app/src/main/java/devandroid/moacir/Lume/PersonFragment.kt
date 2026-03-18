@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -28,7 +27,11 @@ class PersonFragment : Fragment() {
     private lateinit var db: AppDatabase
     private var nomesAntigosParaBackup: List<String> = emptyList()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentPersonalizacaoBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -50,8 +53,15 @@ class PersonFragment : Fragment() {
     private fun carregarCategoriasAtuais() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val categorias = withContext(Dispatchers.IO) { db.orcamentoDao().listarCategorias() }
-                val edits = listOf(binding.editCat1, binding.editCat2, binding.editCat3, binding.editCat4, binding.editCat5)
+                val categorias =
+                    withContext(Dispatchers.IO) { db.orcamentoDao().listarCategorias() }
+                val edits = listOf(
+                    binding.editCat1,
+                    binding.editCat2,
+                    binding.editCat3,
+                    binding.editCat4,
+                    binding.editCat5
+                )
                 edits.forEachIndexed { index, editText ->
                     editText.setText(categorias.find { it.id == index + 2 }?.nome ?: "")
                 }
@@ -134,7 +144,8 @@ class PersonFragment : Fragment() {
                 viewLifecycleOwner.lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         nomesAntigosParaBackup.forEachIndexed { index, nome ->
-                            db.orcamentoDao().upsertCategoria(Categoria(id = index + 2, nome = nome))
+                            db.orcamentoDao()
+                                .upsertCategoria(Categoria(id = index + 2, nome = nome))
                         }
                     }
                     carregarCategoriasAtuais()
@@ -145,7 +156,7 @@ class PersonFragment : Fragment() {
     }
 
     private fun exibirDialogoReset() {
-        AlertDialog.Builder(requireContext())
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle("Reiniciar Categorias")
             .setMessage("Deseja voltar aos nomes padrão?")
             .setPositiveButton("Reiniciar") { _, _ -> reiniciarParaPadrao() }
@@ -154,11 +165,12 @@ class PersonFragment : Fragment() {
     }
 
     private fun exibirDialogoReativarBoasVindas() {
-        AlertDialog.Builder(requireContext())
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle("Reativar Introdução")
             .setMessage("Mostrar a tela de boas-vindas na próxima inicialização?")
             .setPositiveButton("Sim") { _, _ ->
-                val prefs = requireActivity().getSharedPreferences("config_prefs", Context.MODE_PRIVATE)
+                val prefs =
+                    requireActivity().getSharedPreferences("config_prefs", Context.MODE_PRIVATE)
                 prefs.edit().putBoolean("exibir_boas_vindas", true).apply()
                 mostrarToast("Introdução reativada!")
             }
@@ -167,7 +179,13 @@ class PersonFragment : Fragment() {
     }
 
     private fun finalizarEdicao() {
-        val edits = listOf(binding.editCat1, binding.editCat2, binding.editCat3, binding.editCat4, binding.editCat5)
+        val edits = listOf(
+            binding.editCat1,
+            binding.editCat2,
+            binding.editCat3,
+            binding.editCat4,
+            binding.editCat5
+        )
         edits.forEach { it.clearFocus() }
         val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         imm?.hideSoftInputFromWindow(view?.windowToken, 0)
