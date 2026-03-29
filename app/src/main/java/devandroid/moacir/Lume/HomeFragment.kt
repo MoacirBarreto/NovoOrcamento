@@ -96,8 +96,6 @@ class HomeFragment : Fragment() {
             val dataFim = selection.second
 
             if (dataInicio != null && dataFim != null) {
-                // CORREÇÃO DE FUSO HORÁRIO: O MaterialDatePicker trabalha em UTC.
-                // Somamos o offset local para que a data exibida seja a mesma que o usuário clicou.
                 val offset = TimeZone.getDefault().getOffset(Date().time).toLong()
 
                 dataInicioPersonalizada = dataInicio + offset

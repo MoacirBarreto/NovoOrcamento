@@ -65,7 +65,7 @@
     <string name="gerenciar_categorias">Gerenciar Categorias</string>
     <string name="ajustes">Ajustes</string>
     <string name="saiba_mais">Saiba mais</string>
-    <string name="libere_pdf">Libere relatórios em PDF, backup automático e suporte exclusivo.</string>
+    <string name="libere_pdf">Libere relatórios em PDF ou CSV, backup automático e suporte exclusivo.</string>
     <string name="lume_pro">Lume Pro 🔥</string>
     <string name="personalize_cat">Personalize suas categorias de despesas:</string>
 </resources>

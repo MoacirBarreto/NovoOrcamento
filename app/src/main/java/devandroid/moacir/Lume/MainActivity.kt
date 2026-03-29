@@ -20,21 +20,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. Inicializa o ViewBinding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 2. Configura a Toolbar como a ActionBar do sistema
         setSupportActionBar(binding.topAppBar)
-        supportActionBar?.setDisplayShowHomeEnabled(true) // Garante exibição do ícone/logo
-        supportActionBar?.setIcon(R.drawable.ic_toolbar_logo) // Reforça o uso do logo personalizado
-
-        // 3. Configura o NavController
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setIcon(R.drawable.ic_toolbar_logo)
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // 4. Define os destinos principais (onde não aparece a seta de voltar)
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.homeFragment,
@@ -44,24 +39,17 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        // 5. Vincula a Toolbar ao Navigation
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.bottomNavigation.setupWithNavController(navController)
 
-        // 6. Otimização: Garante que o título "LUME" seja fixo em todas as telas
         navController.addOnDestinationChangedListener { _, _, _ ->
             supportActionBar?.title = "LUME"
-            // Se quiser garantir também na view direta da toolbar:
             binding.topAppBar.title = "LUME"
         }
 
-        // 7. Verificação de boas-vindas
         verificarBoasVindas()
     }
 
-    /**
-     * Faz com que o botão de voltar (seta) na Toolbar funcione corretamente
-     */
     override fun onSupportNavigateUp(): Boolean {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -69,9 +57,6 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    /**
-     * Lógica para exibir o diálogo de boas-vindas apenas na primeira vez
-     */
     private fun verificarBoasVindas() {
         val prefs = getSharedPreferences("config_prefs", MODE_PRIVATE)
         val exibirBoasVindas = prefs.getBoolean("exibir_boas_vindas", true)
@@ -89,7 +74,6 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
             .create()
 
-        // Deixa o fundo do diálogo transparente para respeitar os cantos arredondados do seu layout
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         val chkNaoMostrar = dialogView.findViewById<CheckBox>(R.id.chkNaoMostrarNovamente)

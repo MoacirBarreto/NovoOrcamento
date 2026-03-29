@@ -7,10 +7,10 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
+import devandroid.moacir.Lume.model.Agenda
 import devandroid.moacir.Lume.model.Categoria
 import devandroid.moacir.Lume.model.Lancamento
 import devandroid.moacir.Lume.model.SaldoMensal
-import devandroid.moacir.Lume.model.Agenda
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -56,23 +56,27 @@ interface OrcamentoDao {
     @Query("SELECT * FROM lancamentos")
     suspend fun listarLancamentosSemFlow(): List<Lancamento>
 
-    @Query("""
+    @Query(
+        """
         SELECT 
             strftime('%Y-%m', datetime(data/1000, 'unixepoch')) as mesAno,
             SUM(CASE WHEN tipo = 'RECEITA' THEN valor ELSE -valor END) as saldo
         FROM lancamentos 
         GROUP BY mesAno 
         ORDER BY mesAno ASC
-    """)
+    """
+    )
     fun obterEvolucaoSaldo(): Flow<List<SaldoMensal>>
 
-    @Query("""
+    @Query(
+        """
         SELECT 
             SUM(CASE WHEN tipo = 'RECEITA' THEN valor ELSE 0 END) as receitas,
             SUM(CASE WHEN tipo = 'DESPESA' THEN valor ELSE 0 END) as despesas
         FROM lancamentos 
         WHERE data BETWEEN :inicio AND :fim
-    """)
+    """
+    )
     suspend fun obterResumoFinanceiro(inicio: Long, fim: Long): ResumoFinanceiro
 
     data class ResumoFinanceiro(val receitas: Double, val despesas: Double)

@@ -62,14 +62,10 @@ class PersonFragment : Fragment() {
         binding.btnExportarPDF.setOnClickListener { exibirDialogoPremium() }
     }
 
-    /**
-     * Diálogo para editar os nomes das 5 categorias personalizáveis
-     */
     private fun exibirDialogoGerenciarCategorias() {
         val inflater = LayoutInflater.from(requireContext())
         val viewDialog = inflater.inflate(R.layout.dialog_edit_categorias, null)
 
-        // Referências dos EditTexts dentro do diálogo
         val edit1 =
             viewDialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editCat1)
         val edit2 =
@@ -81,10 +77,8 @@ class PersonFragment : Fragment() {
         val edit5 =
             viewDialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editCat5)
 
-        // Carregar nomes atuais do banco de dados para preencher os campos
         viewLifecycleOwner.lifecycleScope.launch {
             val cats = withContext(Dispatchers.IO) { db.orcamentoDao().listarCategorias() }
-            // Assumindo que as cats editáveis começam no ID 2 (ID 1 é Receita)
             val editaveis = cats.filter { it.id >= 2 }
             edit1.setText(editaveis.getOrNull(0)?.nome ?: "")
             edit2.setText(editaveis.getOrNull(1)?.nome ?: "")

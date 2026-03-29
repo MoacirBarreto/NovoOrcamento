@@ -36,8 +36,6 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        // Dentro do AppDatabase.kt
-        // Dentro do seu AppDatabase.kt
         private val DatabaseCallback = object : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {super.onCreate(db)
                 // Usar transação SQL direta no 'db' fornecido pelo onCreate é mais seguro

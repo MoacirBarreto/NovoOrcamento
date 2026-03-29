@@ -14,7 +14,6 @@ class CustomMarkerView(context: Context, layoutResource: Int) :
 
     private val tvContent: TextView = findViewById(R.id.tvContent)
 
-    // FIX: Changed Map.Entry? to Entry?
     override fun refreshContent(e: Entry?, highlight: Highlight?) {
         val valor = e?.y?.toDouble() ?: 0.0
         val fmt = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
@@ -24,7 +23,6 @@ class CustomMarkerView(context: Context, layoutResource: Int) :
     }
 
     override fun getOffset(): MPPointF {
-        // Centraliza o balão acima do ponto
         return MPPointF((-(width / 2)).toFloat(), (-height).toFloat())
     }
 }

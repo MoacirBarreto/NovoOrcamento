@@ -11,7 +11,15 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -27,7 +35,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class GraficosFragment : Fragment() {
 
@@ -78,15 +89,23 @@ class GraficosFragment : Fragment() {
                 val resultado = when (chipId) {
                     R.id.chipMesAtualGrafico -> {
                         cal.set(Calendar.DAY_OF_MONTH, 1)
-                        db.orcamentoDao().listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
+                        db.orcamentoDao()
+                            .listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
                     }
+
                     R.id.chip30DiasGrafico -> {
                         cal.add(Calendar.DAY_OF_YEAR, -30)
-                        db.orcamentoDao().listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
+                        db.orcamentoDao()
+                            .listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
                     }
+
                     R.id.chipPorPeriodoGrafico -> {
-                        db.orcamentoDao().listarLancamentosPorPeriodo(dataInicioPersonalizada, dataFimPersonalizada)
+                        db.orcamentoDao().listarLancamentosPorPeriodo(
+                            dataInicioPersonalizada,
+                            dataFimPersonalizada
+                        )
                     }
+
                     else -> db.orcamentoDao().listarLancamentosSemFlow()
                 }
                 Triple(
@@ -118,7 +137,12 @@ class GraficosFragment : Fragment() {
                 dataFimPersonalizada = dataFim + offset + 86399999
 
                 val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
-                binding.chipPorPeriodoGrafico.text = "${formato.format(Date(dataInicioPersonalizada))} - ${formato.format(Date(dataFimPersonalizada))}"
+                binding.chipPorPeriodoGrafico.text =
+                    "${formato.format(Date(dataInicioPersonalizada))} - ${
+                        formato.format(
+                            Date(dataFimPersonalizada)
+                        )
+                    }"
                 carregarDadosGrafico(R.id.chipPorPeriodoGrafico)
             }
         }
@@ -127,7 +151,9 @@ class GraficosFragment : Fragment() {
     }
 
     private fun atualizarGraficoLinha(dados: List<SaldoMensal>) {
-        if (dados.isEmpty()) { binding.lineChart.clear(); return }
+        if (dados.isEmpty()) {
+            binding.lineChart.clear(); return
+        }
         val corTexto = obterCorTextoBase()
 
         val formatoMesAno = SimpleDateFormat("yyyy-MM", Locale.US)
@@ -142,7 +168,9 @@ class GraficosFragment : Fragment() {
             .filter { it.mesAno in mesesPermitidos }
             .sortedBy { it.mesAno }
 
-        if (dadosFiltrados.isEmpty()) { binding.lineChart.clear(); return }
+        if (dadosFiltrados.isEmpty()) {
+            binding.lineChart.clear(); return
+        }
 
         val entries = mutableListOf<Entry>()
         val labelsX = mutableListOf<String>()
@@ -162,10 +190,12 @@ class GraficosFragment : Fragment() {
             lineWidth = 1.5f
             circleRadius = 4f
             valueTextColor = corTexto
-            setDrawValues(false)
+            setDrawValues(true)
+
             setDrawFilled(true)
+
+            fillColor = corLume
             fillAlpha = 50
-            fillDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.bg_lume_soft)
             mode = LineDataSet.Mode.LINEAR
         }
 
@@ -183,16 +213,21 @@ class GraficosFragment : Fragment() {
                     }
                 }
             }
-            axisLeft.textColor = corTexto
-            legend.textColor = corTexto
-            animateX(800)
+            axisLeft.apply {
+                textColor = corTexto
+                setDrawGridLines(true)
+            }
+            setDrawBorders(false)
+            xAxis.setAvoidFirstLastClipping(true)
             invalidate()
         }
     }
 
     private fun atualizarGraficoBarras(lista: List<Lancamento>) {
-        val receitas = lista.filter { it.tipo == TipoLancamento.RECEITA }.sumOf { it.valor }.toFloat()
-        val despesas = lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf { it.valor }.toFloat()
+        val receitas =
+            lista.filter { it.tipo == TipoLancamento.RECEITA }.sumOf { it.valor }.toFloat()
+        val despesas =
+            lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf { it.valor }.toFloat()
         val corTexto = obterCorTextoBase()
 
         val dataSet = BarDataSet(listOf(BarEntry(0f, receitas), BarEntry(1f, despesas)), "").apply {
@@ -213,12 +248,19 @@ class GraficosFragment : Fragment() {
 
     private fun atualizarGraficoPizza(lista: List<Lancamento>, categorias: List<Categoria>) {
         val despesas = lista.filter { it.tipo == TipoLancamento.DESPESA }
-        if (despesas.isEmpty()) { binding.pieChart.clear(); return }
+        if (despesas.isEmpty()) {
+            binding.pieChart.clear(); return
+        }
         val corTexto = obterCorTextoBase()
 
         val mapaCats = categorias.associateBy({ it.id }, { it.nome })
         val entries = despesas.groupBy { it.categoriaID }
-            .map { (catId, itens) -> PieEntry(itens.sumOf { it.valor }.toFloat(), mapaCats[catId] ?: "Outras") }
+            .map { (catId, itens) ->
+                PieEntry(
+                    itens.sumOf { it.valor }.toFloat(),
+                    mapaCats[catId] ?: "Outras"
+                )
+            }
 
         val dataSet = PieDataSet(entries, "").apply {
             colors = ColorTemplate.MATERIAL_COLORS.toList()
@@ -228,7 +270,8 @@ class GraficosFragment : Fragment() {
             valueTextColor = corTexto
             valueLineColor = corTexto
             valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String = String.format("%.1f%%", value)
+                override fun getFormattedValue(value: Float): String =
+                    String.format("%.1f%%", value)
             }
         }
 
@@ -267,7 +310,8 @@ class GraficosFragment : Fragment() {
                 position = XAxis.XAxisPosition.BOTTOM
                 valueFormatter = object : ValueFormatter() {
                     private val labels = listOf("Receitas", "Despesas")
-                    override fun getFormattedValue(value: Float): String = labels.getOrNull(value.toInt()) ?: ""
+                    override fun getFormattedValue(value: Float): String =
+                        labels.getOrNull(value.toInt()) ?: ""
                 }
                 setDrawGridLines(false)
             }
@@ -291,7 +335,8 @@ class GraficosFragment : Fragment() {
             legend.apply {
                 textColor = cor
                 isWordWrapEnabled = true
-                horizontalAlignment = com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER
+                horizontalAlignment =
+                    com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER
             }
         }
     }
@@ -306,24 +351,32 @@ class GraficosFragment : Fragment() {
         binding.txtTotalDespesasGrafico.text = fmt.format(despesas)
         binding.txtSaldoFinalGrafico.apply {
             text = fmt.format(saldo)
-            setTextColor(ContextCompat.getColor(requireContext(), if (saldo >= 0) R.color.lume_primary else R.color.lume_error))
+            setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    if (saldo >= 0) R.color.lume_primary else R.color.lume_error
+                )
+            )
         }
     }
 
     private fun formatarMesAno(mesAno: String): String {
         return try {
             val date = SimpleDateFormat("yyyy-MM", Locale.US).parse(mesAno)
-            SimpleDateFormat("MMM/yy", Locale("pt", "BR")).format(date!!).replaceFirstChar { it.uppercase() }
-        } catch (e: Exception) { mesAno }
+            SimpleDateFormat("MMM/yy", Locale("pt", "BR")).format(date!!)
+                .replaceFirstChar { it.uppercase() }
+        } catch (e: Exception) {
+            mesAno
+        }
     }
 
-    /**
-     * Otimização: Obtém a cor OnSurface do Material 3.
-     * Isso garante que o texto seja PRETO no modo claro e BRANCO no modo escuro.
-     */
     private fun obterCorTextoBase(): Int {
         val typedValue = TypedValue()
-        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+        requireContext().theme.resolveAttribute(
+            com.google.android.material.R.attr.colorOnSurface,
+            typedValue,
+            true
+        )
         return typedValue.data
     }
 

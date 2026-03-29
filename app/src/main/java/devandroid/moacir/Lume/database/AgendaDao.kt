@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AgendaDao {
 
-    // REMOVA o @Insert antigo que estava aqui com o mesmo nome
-
     @Upsert
     suspend fun upsertAgenda(agenda: Agenda)
 

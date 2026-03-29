@@ -42,10 +42,8 @@ class AgendaFragment : Fragment() {
 
         binding.rvAgenda.layoutManager = LinearLayoutManager(requireContext())
 
-        // 1. CHAMADA DO ALERTA AUTOMÁTICO
         configurarAlertaVencimentos()
 
-        // 2. CARREGAR LISTA DA AGENDA
         viewLifecycleOwner.lifecycleScope.launch {
             db.agendaDao().listarAgenda().collect { lista ->
                 if (lista.isEmpty()) {
@@ -90,7 +88,6 @@ class AgendaFragment : Fragment() {
         val proximaSemana = cal.timeInMillis
 
         viewLifecycleOwner.lifecycleScope.launch {
-            // Observa os vencimentos no banco de dados
             db.orcamentoDao().listarVencimentosProximos(hoje, proximaSemana).collect { lista ->
                 if (lista.isNotEmpty()) {
                     val totalValor = lista.sumOf { it.valor }

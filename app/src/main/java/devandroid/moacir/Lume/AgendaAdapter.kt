@@ -15,7 +15,8 @@ class AgendaAdapter(
     private val onItemClick: (Agenda) -> Unit    // Este deve ser o Click Curto (Editar)
 ) : RecyclerView.Adapter<AgendaAdapter.AgendaViewHolder>() {
 
-    inner class AgendaViewHolder(val binding: ItemAgendaBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class AgendaViewHolder(val binding: ItemAgendaBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AgendaViewHolder {
         val binding = ItemAgendaBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -33,17 +34,11 @@ class AgendaAdapter(
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         holder.binding.txtItemAgendaData.text = sdf.format(item.data)
 
-        // Botão específico de Confirmar Pagamento (Ação rápida)
         holder.binding.btnConfirmarPagamento.setOnClickListener { onConfirmarClick(item) }
 
-        // --- CORREÇÃO DA INVERSÃO DE CLIQUES ---
-
-        // 1. Clique Simples (Curto): EDITAR
         holder.itemView.setOnClickListener {
             onItemClick(item) // Chama a função de edição/detalhes
         }
-
-        // 2. Clique Longo: EXCLUIR
         holder.itemView.setOnLongClickListener {
             onDeleteClick(item) // Chama a função de exclusão
             true // Indica que o evento foi consumido

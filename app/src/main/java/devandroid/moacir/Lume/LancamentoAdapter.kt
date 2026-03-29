@@ -32,7 +32,6 @@ class LancamentoAdapter(
         val lancamento = listaLancamentos[position]
         val context = holder.itemView.context
 
-        // Configura os cliques
         holder.itemView.setOnClickListener {
             onItemClick(lancamento)
         }
@@ -41,7 +40,6 @@ class LancamentoAdapter(
             true
         }
 
-        // Preenche os dados
         holder.binding.tvDescricao.text = lancamento.descricao
 
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
@@ -50,7 +48,6 @@ class LancamentoAdapter(
         val formatoMoeda = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
         holder.binding.tvValor.text = formatoMoeda.format(lancamento.valor)
 
-        // Lógica de Cores (Apenas Texto agora)
         if (lancamento.tipo == TipoLancamento.RECEITA) {
             holder.binding.tvValor.setTextColor(ContextCompat.getColor(context, R.color.green))
         } else { // DESPESA
