@@ -17,8 +17,9 @@ import devandroid.moacir.Lume.model.Lancamento
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.NumberFormat // Correção: Import correto para Java/Android
-import java.util.* // Correção: Import para Locale e Calendar
+import java.text.NumberFormat
+import java.util.Calendar
+import java.util.Locale
 
 class AgendaFragment : Fragment() {
 
@@ -26,7 +27,11 @@ class AgendaFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var db: AppDatabase
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentAgendaBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -55,7 +60,8 @@ class AgendaFragment : Fragment() {
                         onConfirmarClick = { item -> confirmarLancamento(item) },
                         onDeleteClick = { item -> excluirDaAgenda(item) },
                         onItemClick = { item ->
-                            val intent = Intent(requireContext(), NovoLancamentoActivity::class.java)
+                            val intent =
+                                Intent(requireContext(), NovoLancamentoActivity::class.java)
                             intent.putExtra("IS_AGENDA", true)
                             intent.putExtra("LANCAMENTO_ID", item.id)
                             startActivity(intent)

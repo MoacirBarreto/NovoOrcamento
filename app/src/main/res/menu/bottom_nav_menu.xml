@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/nav_home"
+        android:id="@+id/homeFragment"
         android:icon="@drawable/ic_home"
         android:title="@string/inicio" />
 
@@ -13,11 +13,11 @@
         android:title="@string/agenda" />
 
     <item
-        android:id="@+id/nav_graficos"
+        android:id="@+id/graficosFragment"
         android:icon="@drawable/ic_chart"
         android:title="@string/graficos" />
     <item
-        android:id="@+id/action_personalizar"
+        android:id="@+id/personFragment"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/personalizar" />
 

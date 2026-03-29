@@ -7,12 +7,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import devandroid.moacir.Lume.database.AppDatabase
 import devandroid.moacir.Lume.databinding.FragmentPersonalizacaoBinding
 import devandroid.moacir.Lume.model.Categoria
@@ -39,86 +37,98 @@ class PersonFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         db = AppDatabase.getDatabase(requireContext())
-        carregarCategoriasAtuais()
         configurarCliques()
     }
 
     private fun configurarCliques() {
-        binding.btnSalvarCategorias.setOnClickListener { salvarCategorias() }
-        binding.btnResetCategorias.setOnClickListener { exibirDialogoReset() }
-        binding.btnResetBoasVindas.setOnClickListener { exibirDialogoReativarBoasVindas() }
-        binding.btnEnviarFeedback.setOnClickListener { enviarEmailFeedback() }
+        // 1. Clique para Gerenciar Categorias (Abre um diálogo ou lógica de edição)
+        binding.btnCategorias.setOnClickListener {
+            exibirDialogoGerenciarCategorias()
+        }
+
+        // 2. Clique para Resetar Tutorial de Boas-Vindas
+        binding.btnResetBoasVindas.setOnClickListener {
+            exibirDialogoReativarBoasVindas()
+        }
+
+        // 3. Clique para Avaliar na Play Store
+        binding.btnAvaliar.setOnClickListener {
+            abrirPlayStoreParaAvaliar()
+        }
+
+        // 4. Cliques de Monetização / Premium (Cards e Botões Pro)
+        binding.cardPremium.setOnClickListener { exibirDialogoPremium() }
+        binding.btnSejaPro.setOnClickListener { exibirDialogoPremium() }
+        binding.btnExportarPDF.setOnClickListener { exibirDialogoPremium() }
     }
 
-    private fun carregarCategoriasAtuais() {
+    /**
+     * Diálogo para editar os nomes das 5 categorias personalizáveis
+     */
+    private fun exibirDialogoGerenciarCategorias() {
+        val inflater = LayoutInflater.from(requireContext())
+        val viewDialog = inflater.inflate(R.layout.dialog_edit_categorias, null)
+
+        // Referências dos EditTexts dentro do diálogo
+        val edit1 =
+            viewDialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editCat1)
+        val edit2 =
+            viewDialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editCat2)
+        val edit3 =
+            viewDialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editCat3)
+        val edit4 =
+            viewDialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editCat4)
+        val edit5 =
+            viewDialog.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.editCat5)
+
+        // Carregar nomes atuais do banco de dados para preencher os campos
         viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val categorias =
-                    withContext(Dispatchers.IO) { db.orcamentoDao().listarCategorias() }
-                val edits = listOf(
-                    binding.editCat1,
-                    binding.editCat2,
-                    binding.editCat3,
-                    binding.editCat4,
-                    binding.editCat5
+            val cats = withContext(Dispatchers.IO) { db.orcamentoDao().listarCategorias() }
+            // Assumindo que as cats editáveis começam no ID 2 (ID 1 é Receita)
+            val editaveis = cats.filter { it.id >= 2 }
+            edit1.setText(editaveis.getOrNull(0)?.nome ?: "")
+            edit2.setText(editaveis.getOrNull(1)?.nome ?: "")
+            edit3.setText(editaveis.getOrNull(2)?.nome ?: "")
+            edit4.setText(editaveis.getOrNull(3)?.nome ?: "")
+            edit5.setText(editaveis.getOrNull(4)?.nome ?: "")
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Gerenciar Categorias")
+            .setView(viewDialog)
+            .setNeutralButton("Restaurar Padrão") { _, _ -> reiniciarParaPadrao() }
+            .setNegativeButton("Cancelar", null)
+            .setPositiveButton("Salvar") { _, _ ->
+                val novosNomes = listOf(
+                    edit1.text.toString(),
+                    edit2.text.toString(),
+                    edit3.text.toString(),
+                    edit4.text.toString(),
+                    edit5.text.toString()
                 )
-                edits.forEachIndexed { index, editText ->
-                    editText.setText(categorias.find { it.id == index + 2 }?.nome ?: "")
-                }
-            } catch (e: Exception) {
-                mostrarToast("Erro ao carregar dados")
+                salvarNovosNomesCategorias(novosNomes)
             }
-        }
+            .show()
     }
 
-    private fun salvarCategorias() {
-        val novosNomes = listOf(
-            binding.editCat1.text.toString().trim(),
-            binding.editCat2.text.toString().trim(),
-            binding.editCat3.text.toString().trim(),
-            binding.editCat4.text.toString().trim(),
-            binding.editCat5.text.toString().trim()
-        )
-
-        if (novosNomes.any { it.isEmpty() }) {
-            mostrarToast("Preencha todos os campos")
-            return
-        }
-
+    private fun salvarNovosNomesCategorias(nomes: List<String>) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val categoriasAtuais = withContext(Dispatchers.IO) {
-                    db.orcamentoDao().listarCategorias().filter { it.id in 2..6 }
-                }
-                nomesAntigosParaBackup = categoriasAtuais.map { it.nome }
-
                 withContext(Dispatchers.IO) {
-                    novosNomes.forEachIndexed { index, nome ->
-                        db.orcamentoDao().upsertCategoria(Categoria(id = index + 2, nome = nome))
+                    nomes.forEachIndexed { index, nome ->
+                        if (nome.isNotBlank()) {
+                            db.orcamentoDao()
+                                .upsertCategoria(Categoria(id = index + 2, nome = nome))
+                        }
                     }
                 }
-
-                finalizarEdicao()
-                exibirSnackBarDesfazer()
+                mostrarToast("Categorias atualizadas!")
             } catch (e: Exception) {
-                mostrarToast("Erro ao salvar")
+                mostrarToast("Erro ao salvar categorias")
             }
         }
     }
 
-    private fun enviarEmailFeedback() {
-        val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf("seu-email@exemplo.com"))
-            putExtra(Intent.EXTRA_SUBJECT, "Sugestão - App Lume")
-            putExtra(Intent.EXTRA_TEXT, "Olá,\n\nMinha sugestão para o Lume é: ")
-        }
-        try {
-            startActivity(Intent.createChooser(intent, "Enviar sugestão por:"))
-        } catch (e: Exception) {
-            mostrarToast("Nenhum app de e-mail encontrado")
-        }
-    }
 
     private fun reiniciarParaPadrao() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -129,43 +139,15 @@ class PersonFragment : Fragment() {
                         db.orcamentoDao().upsertCategoria(Categoria(id = index + 2, nome = nome))
                     }
                 }
-                carregarCategoriasAtuais()
-                finalizarEdicao()
-                mostrarToast("Categorias restauradas!")
+                mostrarToast("Categorias restauradas com sucesso!")
             } catch (e: Exception) {
-                mostrarToast("Erro ao reiniciar")
+                mostrarToast("Erro ao reiniciar categorias")
             }
         }
     }
 
-    private fun exibirSnackBarDesfazer() {
-        Snackbar.make(binding.root, "Categorias atualizadas!", Snackbar.LENGTH_LONG)
-            .setAction("DESFAZER") {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        nomesAntigosParaBackup.forEachIndexed { index, nome ->
-                            db.orcamentoDao()
-                                .upsertCategoria(Categoria(id = index + 2, nome = nome))
-                        }
-                    }
-                    carregarCategoriasAtuais()
-                }
-            }
-            .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.lume_primary))
-            .show()
-    }
-
-    private fun exibirDialogoReset() {
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Reiniciar Categorias")
-            .setMessage("Deseja voltar aos nomes padrão?")
-            .setPositiveButton("Reiniciar") { _, _ -> reiniciarParaPadrao() }
-            .setNegativeButton("Cancelar", null)
-            .show()
-    }
-
     private fun exibirDialogoReativarBoasVindas() {
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle("Reativar Introdução")
             .setMessage("Mostrar a tela de boas-vindas na próxima inicialização?")
             .setPositiveButton("Sim") { _, _ ->
@@ -178,17 +160,26 @@ class PersonFragment : Fragment() {
             .show()
     }
 
-    private fun finalizarEdicao() {
-        val edits = listOf(
-            binding.editCat1,
-            binding.editCat2,
-            binding.editCat3,
-            binding.editCat4,
-            binding.editCat5
-        )
-        edits.forEach { it.clearFocus() }
-        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.hideSoftInputFromWindow(view?.windowToken, 0)
+    private fun exibirDialogoPremium() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Lume Pro 🔥")
+            .setMessage("A versão Pro está em desenvolvimento!\n\nEm breve você poderá exportar relatórios em PDF, ter backup automático e temas exclusivos.")
+            .setPositiveButton("Entendido", null)
+            .show()
+    }
+
+    private fun abrirPlayStoreParaAvaliar() {
+        val packageName = requireContext().packageName
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+        } catch (e: Exception) {
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+                )
+            )
+        }
     }
 
     private fun mostrarToast(mensagem: String) {

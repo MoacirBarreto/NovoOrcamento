@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
-    android:background="?attr/colorSurface"
+    android:background="@drawable/bg_lume_soft"
     android:elevation="8dp"
     android:padding="24dp">
 
@@ -12,94 +12,87 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- TÍTULO PRINCIPAL -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="4dp"
             android:text="@string/bem_vindo"
-            android:textColor="@color/lume_text_title"
+            android:textColor="#3E2723"
             android:textSize="24sp"
             android:textStyle="bold" />
-        <!-- SUBTÍTULO (Slogan): Menor e com menos peso para dar elegância -->
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="24dp"
             android:text="@string/planeje"
-            android:textColor="@color/lume_text_body"
-            android:textSize="16sp"
-            android:textStyle="normal" />
+            android:textColor="#5D4037"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/voce_manda"
-            android:textColor="@color/lume_text_title"
-            android:textSize="16sp" />
+            android:textColor="#3E2723"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-        <!-- SEÇÃO DE INSTRUÇÕES -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:text="@string/lancamentos_clique"
-            android:textColor="@color/lume_text_body" />
+            android:textColor="#5D4037" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/agenda_planeje_o_futuro"
-            android:textColor="@color/lume_text_body" />
+            android:textColor="#5D4037" />
 
-        <!-- AVISO DE ATENÇÃO: Vermelho mais suave para não ser agressivo -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/atencao"
-            android:textColor="@color/lume_error"
-            android:textSize="14sp"
+            android:textColor="#B71C1C"
             android:textStyle="italic" />
 
-        <!-- MENSAGEM IMPORTANTE: Azul marinho para dar autoridade -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/importante"
-            android:textColor="@color/lume_important"
-            android:textSize="15sp"
+            android:textColor="#E65100"
             android:textStyle="bold" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="16dp"
-            android:background="?android:attr/listDivider" />
+            android:background="#305D4037" />
 
-        <!-- CHECKBOX: Cor de texto neutra -->
         <CheckBox
             android:id="@+id/chkNaoMostrarNovamente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:buttonTint="@color/lume_text_body"
+            android:buttonTint="#3E2723"
             android:text="@string/entendi_tudo"
-            android:textColor="?attr/colorOnSurface" />
+            android:textColor="#3E2723"
+            android:textStyle="bold" />
 
-        <!-- BOTÃO PRINCIPAL: Agora com margem superior maior para destaque -->
         <Button
             android:id="@+id/btnEntendido"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="20dp"
-            android:backgroundTint="@color/lume_primary_variant"
+            android:backgroundTint="#EF6C00"
             android:text="@string/vamos_comecar"
-            android:textAllCaps="true"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold" />

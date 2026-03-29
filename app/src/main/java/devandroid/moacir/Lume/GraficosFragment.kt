@@ -3,6 +3,7 @@ package devandroid.moacir.Lume
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -127,6 +128,7 @@ class GraficosFragment : Fragment() {
 
     private fun atualizarGraficoLinha(dados: List<SaldoMensal>) {
         if (dados.isEmpty()) { binding.lineChart.clear(); return }
+        val corTexto = obterCorTextoBase()
 
         val formatoMesAno = SimpleDateFormat("yyyy-MM", Locale.US)
         val cal = Calendar.getInstance()
@@ -159,6 +161,7 @@ class GraficosFragment : Fragment() {
             circleColors = coresCirculos
             lineWidth = 1.5f
             circleRadius = 4f
+            valueTextColor = corTexto
             setDrawValues(false)
             setDrawFilled(true)
             fillAlpha = 50
@@ -169,6 +172,7 @@ class GraficosFragment : Fragment() {
         binding.lineChart.apply {
             data = LineData(dataSet)
             xAxis.apply {
+                textColor = corTexto
                 isGranularityEnabled = true
                 granularity = 1f
                 setLabelCount(labelsX.size, false)
@@ -179,6 +183,8 @@ class GraficosFragment : Fragment() {
                     }
                 }
             }
+            axisLeft.textColor = corTexto
+            legend.textColor = corTexto
             animateX(800)
             invalidate()
         }
@@ -187,15 +193,19 @@ class GraficosFragment : Fragment() {
     private fun atualizarGraficoBarras(lista: List<Lancamento>) {
         val receitas = lista.filter { it.tipo == TipoLancamento.RECEITA }.sumOf { it.valor }.toFloat()
         val despesas = lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf { it.valor }.toFloat()
+        val corTexto = obterCorTextoBase()
 
         val dataSet = BarDataSet(listOf(BarEntry(0f, receitas), BarEntry(1f, despesas)), "").apply {
             colors = listOf(Color.rgb(76, 175, 80), Color.rgb(244, 67, 54))
             valueFormatter = CurrencyFormatter()
             valueTextSize = 10f
+            valueTextColor = corTexto
         }
 
         binding.barChart.apply {
             data = BarData(dataSet).apply { barWidth = 0.5f }
+            xAxis.textColor = corTexto
+            axisLeft.textColor = corTexto
             animateY(800)
             invalidate()
         }
@@ -204,6 +214,7 @@ class GraficosFragment : Fragment() {
     private fun atualizarGraficoPizza(lista: List<Lancamento>, categorias: List<Categoria>) {
         val despesas = lista.filter { it.tipo == TipoLancamento.DESPESA }
         if (despesas.isEmpty()) { binding.pieChart.clear(); return }
+        val corTexto = obterCorTextoBase()
 
         val mapaCats = categorias.associateBy({ it.id }, { it.nome })
         val entries = despesas.groupBy { it.categoriaID }
@@ -214,6 +225,8 @@ class GraficosFragment : Fragment() {
             yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
             valueTextSize = 11f
             sliceSpace = 3f
+            valueTextColor = corTexto
+            valueLineColor = corTexto
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String = String.format("%.1f%%", value)
             }
@@ -222,6 +235,8 @@ class GraficosFragment : Fragment() {
         binding.pieChart.apply {
             data = PieData(dataSet)
             setUsePercentValues(true)
+            setEntryLabelColor(corTexto)
+            legend.textColor = corTexto
             animateXY(800, 800)
             invalidate()
         }
@@ -267,12 +282,14 @@ class GraficosFragment : Fragment() {
     }
 
     private fun configurarGraficoPizzaInicial() {
+        val cor = obterCorTextoBase()
         binding.pieChart.apply {
             description.isEnabled = false
             setHoleColor(Color.TRANSPARENT)
-            setCenterTextColor(obterCorTextoBase())
+            setCenterTextColor(cor)
+            setEntryLabelColor(cor)
             legend.apply {
-                textColor = obterCorTextoBase()
+                textColor = cor
                 isWordWrapEnabled = true
                 horizontalAlignment = com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER
             }
@@ -300,7 +317,15 @@ class GraficosFragment : Fragment() {
         } catch (e: Exception) { mesAno }
     }
 
-    private fun obterCorTextoBase() = ContextCompat.getColor(requireContext(), R.color.lume_text_title)
+    /**
+     * Otimização: Obtém a cor OnSurface do Material 3.
+     * Isso garante que o texto seja PRETO no modo claro e BRANCO no modo escuro.
+     */
+    private fun obterCorTextoBase(): Int {
+        val typedValue = TypedValue()
+        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+        return typedValue.data
+    }
 
     private class CurrencyFormatter : ValueFormatter() {
         override fun getFormattedValue(value: Float): String =

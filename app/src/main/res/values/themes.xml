@@ -1,18 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.Lume" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Cor dos Botões e Elementos Ativos -->
-        <item name="colorPrimary">@color/lume_primary</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-
-        <!-- Cor de fundo de todas as Activitys -->
-        <item name="android:windowBackground">@color/lume_bg_warm</item>
-
-        <!-- Cor da Barra de Navegação Inferior (BottomNav) -->
-        <item name="colorSecondaryContainer">@color/lume_accent</item>
-        <item name="colorOnSecondaryContainer">@color/lume_text_title</item>
-
-        <!-- Cor da Barra de Status (Topo) -->
-        <item name="android:statusBarColor">@color/lume_bg_warm</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="colorPrimary">@color/lume_orange_primary</item>
+        <item name="android:windowBackground">@color/md_theme_light_background</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
     </style>
 </resources>

@@ -5,10 +5,6 @@ plugins {
     id("kotlin-parcelize")
 }
 
-//configurations.all {
-//    exclude(group = "com.intellij", module = "annotations")
-//}
-
 android {
     namespace = "devandroid.moacir.Lume"
     compileSdk = 35

@@ -3,15 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/nav_home">
+    app:startDestination="@id/homeFragment">
 
     <!-- Tela Inicial -->
     <fragment
-        android:id="@+id/nav_home"
+        android:id="@+id/homeFragment"
         android:name="devandroid.moacir.Lume.HomeFragment"
-        android:label="Início"
+        android:label="Lançamentos"
         tools:layout="@layout/fragment_home" />
 
+    <!-- Tela de Agenda -->
     <fragment
         android:id="@+id/agendaFragment"
         android:name="devandroid.moacir.Lume.AgendaFragment"
@@ -20,13 +21,14 @@
 
     <!-- Tela de Gráficos -->
     <fragment
-        android:id="@+id/nav_graficos"
+        android:id="@+id/graficosFragment"
         android:name="devandroid.moacir.Lume.GraficosFragment"
         android:label="Gráficos"
         tools:layout="@layout/fragment_graficos" />
 
+    <!-- Tela de Personalização -->
     <fragment
-        android:id="@+id/action_personalizar"
+        android:id="@+id/personFragment"
         android:name="devandroid.moacir.Lume.PersonFragment"
         android:label="Personalizar"
         tools:layout="@layout/fragment_personalizacao" />

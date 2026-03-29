@@ -1,30 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Cores Principais (Lume) -->
+    <color name="lume_orange_primary">#FF9800</color>
+    <color name="lume_orange_light">#FFB74D</color>
+    <color name="lume_orange_dark">#F57C00</color>
+
+    <!-- Modo Claro - Superfícies -->
+    <color name="md_theme_light_background">#FFFBFE</color>
+    <color name="md_theme_light_surface">#FFFFFF</color>
+    <color name="md_theme_light_onSurface">#1C1B1F</color>
+
+    <!-- Modo Escuro - Superfícies (O segredo do conforto visual) -->
+    <color name="md_theme_dark_background">#121212</color> <!-- Fundo principal -->
+    <color name="md_theme_dark_surface">#1E1E1E</color>    <!-- Cards e campos de texto -->
+    <color name="md_theme_dark_onSurface">#E6E1E5</color>  <!-- Texto principal -->
+    <color name="md_theme_dark_primary">#FFB74D
+    </color>    <!-- Laranja um pouco mais claro para não "queimar" o olho -->
+
+    <!-- Status -->
+    <color name="status_red">#CF6679</color>   <!-- Vermelho suave para Dark Mode -->
+    <color name="status_green">#81C784</color> <!-- Verde suave para Dark Mode -->
+
+    <!-- Basic Colors -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Colors requested by your layouts -->
     <color name="green">#4CAF50</color>
     <color name="red">#F44336</color>
-    <color name="blue_primary">#060AB1</color>
-    <color name="blue_secondary">#0F172A</color>
-    <color name="gold">#F59E0B</color>
+    <color name="lume_error">#B00020</color>
 
-    <!-- Tons de Marca (Fogo/Luz) -->
-    <color name="lume_primary">#FF9800</color>       <!-- Laranja Vibrante -->
-    <color name="lume_primary_variant">#E65100</color> <!-- Laranja Queimado -->
-    <color name="lume_accent">#FFC107</color>        <!-- Ouro/Âmbar -->
+    <!-- Colors requested by bg_lume_soft.xml -->
+    <color name="lume_bg_warm">#FFF4E1</color>
+    <color name="lume_bg_gradient_end">#FFE0B2</color>
+    <color name="lume_primary">#FF9800</color>
+    <color name="lume_text_title">#000000</color>
 
-    <!-- Tons de Fundo (Calor/Suavidade) -->
-    <color name="lume_bg_warm">#FFFDE7</color>       <!-- Creme muito suave -->
-    <color name="lume_bg_gradient_end">#FBD765</color> <!-- Areia suave
-    <color name="lume_bg_gradient_end">#E6D7A8</color>  Areia suave -->
-
-    <!-- Tons de Texto (Hierarquia) -->
-    <color name="lume_text_title">#3E2723</color>    <!-- Marrom Café (Substitui o Preto) -->
-    <color name="lume_text_body">#5D4037</color>     <!-- Marrom Médio -->
-    <color name="lume_text_light">#8D6E63</color>    <!-- Marrom Suave -->
-
-    <!-- Cores de Estado -->
-    <color name="lume_error">#B71C1C</color>         <!-- Vermelho Alerta -->
-    <color name="lume_important">#1A237E</color>     <!-- Azul Marinho para Destaque -->
-    <color name="lume_marrom">#3E2723</color>     <!-- Azul Marinho para Destaque -->
+    <!-- Add any other colors your project uses below -->
 </resources>

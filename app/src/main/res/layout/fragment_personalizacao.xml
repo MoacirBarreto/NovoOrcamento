@@ -1,142 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="?attr/colorSurface"
+    tools:context=".PersonFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/personalizar_categorias"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/defina_suas_5_cat" />
-
-        <!-- Campos de Categoria -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        <!-- CARD PRO (MONETIZAÇÃO) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardPremium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:hint="@string/categoria_1">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editCat1"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="@color/lume_primary"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:hint="@string/categoria_2">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editCat2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:hint="@string/categoria_3">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editCat3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:hint="@string/categoria_4">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editCat4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:hint="@string/categoria_5">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editCat5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <Button
-            android:id="@+id/btnSalvarCategorias"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/salvar_categorias" />
-
-        <Button
-            android:id="@+id/btnResetCategorias"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/reiniciar_categ" />
-
-        <Button
-            android:id="@+id/btnResetBoasVindas"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/reativar_b_vindas" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"
-            android:background="#20000000" />
-
-        <LinearLayout
-            android:id="@+id/btnEnviarFeedback"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_email"
-                app:tint="@color/lume_primary" />
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/contato_suporte"
-                android:textColor="@color/lume_text_title"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/txtTituloPro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lume_pro"
+                    android:textColor="@android:color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txtDescricaoPro"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/libere_pdf"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toStartOf="@+id/imgPro"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtTituloPro" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSejaPro"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/saiba_mais"
+                    android:textColor="@color/lume_primary"
+                    app:backgroundTint="@android:color/white"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtDescricaoPro" />
+
+                <ImageView
+                    android:id="@+id/imgPro"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:alpha="0.3"
+                    android:src="@drawable/ic_check"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@android:color/white" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- SEÇÃO: AJUSTES -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/ajustes"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorPrimary" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- GERENCIAR CATEGORIAS -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCategorias"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/gerenciar_categorias"
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@android:drawable/ic_menu_edit"
+                    app:iconTint="?attr/colorOnSurfaceVariant" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="?attr/colorOutlineVariant" />
+
+                <!-- EXPORTAR DADOS -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExportarPDF"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/exportar_pdf"
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@android:drawable/ic_menu_save"
+                    app:iconTint="@color/lume_primary" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- SEÇÃO: SOBRE -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/sobre_o_app"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorPrimary" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- AVALIAR APP -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAvaliar"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/avaliar_play"
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@android:drawable/btn_star"
+                    app:iconTint="?attr/colorOnSurfaceVariant" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="?attr/colorOutlineVariant" />
+
+                <!-- RESET BOAS VINDAS -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnResetBoasVindas"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/ver_tutorial_novamente"
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@android:drawable/ic_menu_help"
+                    app:iconTint="?attr/colorOnSurfaceVariant" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="?attr/colorOutlineVariant" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:text="@string/versao_app"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

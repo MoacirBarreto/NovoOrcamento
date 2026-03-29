@@ -105,7 +105,11 @@ class HomeFragment : Fragment() {
                 dataFimPersonalizada = dataFim + offset + 86399999
 
                 val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
-                binding.chipPorPeriodo.text = "${formato.format(Date(dataInicioPersonalizada))} - ${formato.format(Date(dataFimPersonalizada))}"
+                binding.chipPorPeriodo.text = "${formato.format(Date(dataInicioPersonalizada))} - ${
+                    formato.format(
+                        Date(dataFimPersonalizada)
+                    )
+                }"
 
                 carregarLista(R.id.chipPorPeriodo)
             }
@@ -129,7 +133,8 @@ class HomeFragment : Fragment() {
                 when (chipId) {
                     R.id.chipMesAtual -> {
                         calendario.set(Calendar.DAY_OF_MONTH, 1)
-                        db.orcamentoDao().listarLancamentosPorPeriodo(calendario.timeInMillis, agora)
+                        db.orcamentoDao()
+                            .listarLancamentosPorPeriodo(calendario.timeInMillis, agora)
                     }
 
                     R.id.chip30Dias -> {

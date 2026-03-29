@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="?attr/colorSurface"
     tools:context=".GraficosFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -12,15 +13,16 @@
         android:layout_height="wrap_content"
         android:paddingBottom="32dp">
 
-        <!-- 1. CARD DE RESUMO -->
-        <androidx.cardview.widget.CardView
+        <!-- 1. CARD DE RESUMO - Otimizado com cores dinâmicas -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardResumoGrafico"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            app:cardBackgroundColor="#F5F5F5"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainer"
             app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
@@ -40,13 +42,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/receitas"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp" />
                     <TextView
                         android:id="@+id/txtTotalReceitasGrafico"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/RS_0"
-                        android:textColor="@color/green"
+                        android:textColor="#2E7D32"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -60,13 +64,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/despesas"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp" />
                     <TextView
                         android:id="@+id/txtTotalDespesasGrafico"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/RS_0"
-                        android:textColor="@color/red"
+                        android:textColor="#C62828"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -80,20 +86,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/saldo"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="12sp" />
                     <TextView
                         android:id="@+id/txtSaldoFinalGrafico"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/RS_0"
-                        android:textColor="@android:color/black"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- 2. FILTROS -->
+        <!-- 2. FILTROS (Chips Material 3) -->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupFiltrosGrafico"
             android:layout_width="0dp"
@@ -107,27 +114,27 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipMesAtualGrafico"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/mes_atual" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip30DiasGrafico"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/ultimos_30_dias" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipPorPeriodoGrafico"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/periodo" />
         </com.google.android.material.chip.ChipGroup>
 
-        <!-- [ORDEM 1] GRÁFICO DE BARRAS (RECEITAS VS DESPESAS) -->
+        <!-- [ORDEM 1] GRÁFICO DE BARRAS -->
         <TextView
             android:id="@+id/lblBarras"
             android:layout_width="wrap_content"
@@ -135,6 +142,8 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
             android:text="@string/receitas_e_despesas"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/chipGroupFiltrosGrafico" />
@@ -146,14 +155,16 @@
             android:layout_margin="16dp"
             app:layout_constraintTop_toBottomOf="@id/lblBarras" />
 
-        <!-- [ORDEM 2] GRÁFICO DE PIZZA (DESPESAS POR CATEGORIA) -->
+        <!-- [ORDEM 2] GRÁFICO DE PIZZA -->
         <TextView
             android:id="@+id/lblPizza"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="32dp"
             android:text="@string/despesas_por_categoria"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/barChart" />
@@ -165,14 +176,16 @@
             android:layout_margin="16dp"
             app:layout_constraintTop_toBottomOf="@id/lblPizza" />
 
-        <!-- [ORDEM 3] GRÁFICO DE LINHA (EVOLUÇÃO MENSAL) -->
+        <!-- [ORDEM 3] GRÁFICO DE LINHA -->
         <TextView
             android:id="@+id/lblEvolucao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="32dp"
             android:text="@string/evol_mensal_saldo"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pieChart" />
@@ -182,6 +195,7 @@
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_margin="16dp"
+            android:layout_marginBottom="32dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/lblEvolucao" />
 

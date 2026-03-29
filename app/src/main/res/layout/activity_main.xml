@@ -4,33 +4,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <!-- 1. BARRA DE TÍTULO (TOOLBAR) -->
+    <!-- BARRA DE TÍTULO (MATERIAL 3) -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:paddingTop="16dp"
-        app:elevation="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:background="?attr/colorSurface"
+        app:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="@string/app_name"
-            app:titleCentered="true" />
+            android:layout_height="64dp"
+            android:background="?attr/colorSurface"
+            app:elevation="4dp"
+            app:logo="@drawable/ic_toolbar_logo"
+            app:title="LUME"
+            app:titleCentered="false"
+            app:titleMarginStart="5dp"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
+            app:titleTextColor="?attr/colorOnSurface" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- 2. CONTAINER DE NAVEGAÇÃO (NavHostFragment) -->
-    <!-- Trocado de FrameLayout para FragmentContainerView para suportar Navigation -->
+    <!-- CONTAINER DE NAVEGAÇÃO (NAV HOST) -->
+    <!-- Mudei o ID para nav_host_fragment para seguir o padrão -->
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainer"
+        android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -41,12 +46,13 @@
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:navGraph="@navigation/nav_graph" />
 
-    <!-- 3. BARRA DE NAVEGAÇÃO INFERIOR -->
+    <!-- BARRA DE NAVEGAÇÃO INFERIOR -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="?attr/colorSurface"
+        app:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
