@@ -313,15 +313,10 @@ class GraficosFragment : Fragment() {
                     override fun getFormattedValue(value: Float): String =
                         labels.getOrNull(value.toInt()) ?: ""
                 }
-                setDrawGridLines(false)
             }
-            axisLeft.apply {
-                textColor = cor
-                axisMinimum = 0f
-                setDrawGridLines(true)
-            }
+            axisLeft.textColor = cor
             axisRight.isEnabled = false
-            legend.isEnabled = false
+            legend.textColor = cor
         }
     }
 
@@ -329,15 +324,11 @@ class GraficosFragment : Fragment() {
         val cor = obterCorTextoBase()
         binding.pieChart.apply {
             description.isEnabled = false
+            holeRadius = 40f
+            transparentCircleRadius = 45f
             setHoleColor(Color.TRANSPARENT)
-            setCenterTextColor(cor)
-            setEntryLabelColor(cor)
-            legend.apply {
-                textColor = cor
-                isWordWrapEnabled = true
-                horizontalAlignment =
-                    com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER
-            }
+            legend.textColor = cor
+            setNoDataText("Adicione despesas para ver o gráfico")
         }
     }
 
@@ -363,8 +354,8 @@ class GraficosFragment : Fragment() {
     private fun formatarMesAno(mesAno: String): String {
         return try {
             val date = SimpleDateFormat("yyyy-MM", Locale.US).parse(mesAno)
+            // Força PT-BR para aparecer Abr/24 em vez de Apr/24
             SimpleDateFormat("MMM/yy", Locale("pt", "BR")).format(date!!)
-                .replaceFirstChar { it.uppercase() }
         } catch (e: Exception) {
             mesAno
         }
@@ -380,13 +371,14 @@ class GraficosFragment : Fragment() {
         return typedValue.data
     }
 
-    private class CurrencyFormatter : ValueFormatter() {
-        override fun getFormattedValue(value: Float): String =
-            NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(value)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    inner class CurrencyFormatter : ValueFormatter() {
+        override fun getFormattedValue(value: Float): String {
+            return NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(value)
+        }
     }
 }

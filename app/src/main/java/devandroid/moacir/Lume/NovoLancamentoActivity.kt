@@ -71,7 +71,8 @@ class NovoLancamentoActivity : AppCompatActivity() {
             val idRecebido = intent.getIntExtra("LANCAMENTO_ID", -1)
 
             // 1. Configura visibilidade do container de repetição
-            binding.containerRepetir.visibility = if (isAgenda && idRecebido == -1) View.VISIBLE else View.GONE
+            binding.containerRepetir.visibility =
+                if (isAgenda && idRecebido == -1) View.VISIBLE else View.GONE
 
             // 2. Busca categorias no banco
             categorias = withContext(Dispatchers.IO) { db.orcamentoDao().listarCategorias() }
@@ -85,23 +86,30 @@ class NovoLancamentoActivity : AppCompatActivity() {
             binding.spinnerCategorias.adapter = adapter
 
             // 4. Listener do Spinner com lógica de atualização de descrição
-            binding.spinnerCategorias.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(p: AdapterView<*>?, v: View?, position: Int, id: Long) {
-                    if (!bloqueioManual && binding.rbDespesa.isChecked) {
-                        val novaCatNome = categorias[position].nome
-                        val descAtual = binding.edtDescricao.text.toString().trim()
+            binding.spinnerCategorias.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        p: AdapterView<*>?,
+                        v: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        if (!bloqueioManual && binding.rbDespesa.isChecked) {
+                            val novaCatNome = categorias[position].nome
+                            val descAtual = binding.edtDescricao.text.toString().trim()
 
-                        // Lista de nomes de categorias para comparar
-                        val nomesDasCategorias = categorias.map { it.nome.lowercase() }
+                            // Lista de nomes de categorias para comparar
+                            val nomesDasCategorias = categorias.map { it.nome.lowercase() }
 
-                        // ATUALIZA SE: a descrição estiver vazia OU se a descrição atual for o nome de alguma categoria
-                        if (descAtual.isEmpty() || nomesDasCategorias.contains(descAtual.lowercase())) {
-                            binding.edtDescricao.setText(novaCatNome)
+                            // ATUALIZA SE: a descrição estiver vazia OU se a descrição atual for o nome de alguma categoria
+                            if (descAtual.isEmpty() || nomesDasCategorias.contains(descAtual.lowercase())) {
+                                binding.edtDescricao.setText(novaCatNome)
+                            }
                         }
                     }
+
+                    override fun onNothingSelected(p: AdapterView<*>?) {}
                 }
-                override fun onNothingSelected(p: AdapterView<*>?) {}
-            }
 
             // 5. Se for edição, carrega os dados
             if (idRecebido != -1) {
@@ -138,13 +146,20 @@ class NovoLancamentoActivity : AppCompatActivity() {
         }
     }
 
-    private fun preencherCampos(desc: String, valor: Double, tipo: TipoLancamento, data: Long, catId: Int) {
+    private fun preencherCampos(
+        desc: String,
+        valor: Double,
+        tipo: TipoLancamento,
+        data: Long,
+        catId: Int
+    ) {
         with(binding) {
             val valorFormatado = NumberFormat.getCurrencyInstance(Locale("pt", "BR")).format(valor)
             edtValor.setText(valorFormatado)
             edtDescricao.setText(desc)
 
-            if (tipo == TipoLancamento.RECEITA) rbReceita.isChecked = true else rbDespesa.isChecked = true
+            if (tipo == TipoLancamento.RECEITA) rbReceita.isChecked =
+                true else rbDespesa.isChecked = true
             atualizarVisibilidadeCategoria(tipo == TipoLancamento.DESPESA)
 
             val cal = Calendar.getInstance().apply { timeInMillis = data }
@@ -169,7 +184,8 @@ class NovoLancamentoActivity : AppCompatActivity() {
             }
 
             val valorFinal = cleanValor.toDouble() / 100
-            val tipo = if (binding.rbReceita.isChecked) TipoLancamento.RECEITA else TipoLancamento.DESPESA
+            val tipo =
+                if (binding.rbReceita.isChecked) TipoLancamento.RECEITA else TipoLancamento.DESPESA
             val catId = if (tipo == TipoLancamento.DESPESA) {
                 categorias[binding.spinnerCategorias.selectedItemPosition].id
             } else {
@@ -187,52 +203,103 @@ class NovoLancamentoActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun salvarAgenda(desc: String, valor: Double, tipo: TipoLancamento, catId: Int) {
+    private suspend fun salvarAgenda(
+        desc: String,
+        valor: Double,
+        tipo: TipoLancamento,
+        catId: Int
+    ) {
         if (agendaParaEditar != null) {
             db.agendaDao().upsertAgenda(
                 agendaParaEditar!!.copy(
-                    descricao = desc, valor = valor, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
+                    descricao = desc,
+                    valor = valor,
+                    data = dataSelecionadaMillis,
+                    categoriaID = catId,
+                    tipo = tipo
                 )
             )
         } else {
-            val numRepeticoes = binding.edtQtdMeses.text.toString().toIntOrNull()?.coerceAtLeast(1) ?: 1
+            val numRepeticoes =
+                binding.edtQtdMeses.text.toString().toIntOrNull()?.coerceAtLeast(1) ?: 1
             val cal = Calendar.getInstance().apply { timeInMillis = dataSelecionadaMillis }
             for (i in 0 until numRepeticoes) {
                 val descFinal = if (numRepeticoes > 1) "$desc (${i + 1}/$numRepeticoes)" else desc
                 db.agendaDao().upsertAgenda(
-                    Agenda(id = 0, descricao = descFinal, valor = valor, data = cal.timeInMillis, categoriaID = catId, tipo = tipo)
+                    Agenda(
+                        id = 0,
+                        descricao = descFinal,
+                        valor = valor,
+                        data = cal.timeInMillis,
+                        categoriaID = catId,
+                        tipo = tipo
+                    )
                 )
                 cal.add(Calendar.MONTH, 1)
             }
         }
     }
 
-    private suspend fun salvarLancamento(desc: String, valor: Double, tipo: TipoLancamento, catId: Int) {
+    private suspend fun salvarLancamento(
+        desc: String,
+        valor: Double,
+        tipo: TipoLancamento,
+        catId: Int
+    ) {
         val lancamento = lancamentoParaEditar?.copy(
-            descricao = desc, valor = valor, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
+            descricao = desc,
+            valor = valor,
+            data = dataSelecionadaMillis,
+            categoriaID = catId,
+            tipo = tipo
         ) ?: Lancamento(
-            id = 0, descricao = desc, valor = valor, data = dataSelecionadaMillis, categoriaID = catId, tipo = tipo
+            id = 0,
+            descricao = desc,
+            valor = valor,
+            data = dataSelecionadaMillis,
+            categoriaID = catId,
+            tipo = tipo
         )
         db.orcamentoDao().upsertLancamento(lancamento)
     }
 
     private fun configurarCampoData() {
         binding.edtData.setOnClickListener {
+            // Criamos o seletor garantindo que ele comece na data que já está na tela
             val builder = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione a Data")
                 .setSelection(dataSelecionadaMillis)
 
             val picker = builder.build()
             picker.addOnPositiveButtonClickListener { selection ->
-                val offset = TimeZone.getDefault().getOffset(selection)
-                val cal = Calendar.getInstance().apply { timeInMillis = selection - offset }
-                atualizarTextoData(cal)
+                // O MaterialDatePicker retorna a data em UTC meia-noite.
+                // Para evitar que o fuso horário do Brasil (UTC-3) jogue a data para o dia anterior,
+                // precisamos compensar o offset.
+                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                calendar.timeInMillis = selection
+
+                // Agora convertemos para o calendário local sem mudar o dia
+                val localCalendar = Calendar.getInstance()
+                localCalendar.set(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                )
+
+                atualizarTextoData(localCalendar)
             }
             picker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
         }
     }
 
     private fun atualizarTextoData(calendario: Calendar) {
+        // Zeramos as horas, minutos e segundos para garantir que a
+        // data selecionada represente o início do dia (00:00:00)
+        calendario.set(Calendar.HOUR_OF_DAY, 0)
+        calendario.set(Calendar.MINUTE, 0)
+        calendario.set(Calendar.SECOND, 0)
+        calendario.set(Calendar.MILLISECOND, 0)
+
         val formato = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
         binding.edtData.setText(formato.format(calendario.time))
         dataSelecionadaMillis = calendario.timeInMillis
