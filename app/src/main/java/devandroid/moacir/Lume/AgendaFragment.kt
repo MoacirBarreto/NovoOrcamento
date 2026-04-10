@@ -14,6 +14,7 @@ import devandroid.moacir.Lume.database.AppDatabase
 import devandroid.moacir.Lume.databinding.FragmentAgendaBinding
 import devandroid.moacir.Lume.model.Agenda
 import devandroid.moacir.Lume.model.Lancamento
+import devandroid.moacir.Lume.model.TipoLancamento
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -78,20 +79,28 @@ class AgendaFragment : Fragment() {
 
     private fun configurarAlertaVencimentos() {
         val cal = Calendar.getInstance()
+        // Zera o horário para o início do dia de hoje
         cal.set(Calendar.HOUR_OF_DAY, 0)
         cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
         val hoje = cal.timeInMillis
 
+        // Define o limite para daqui a 7 dias no final do dia
         cal.add(Calendar.DAY_OF_YEAR, 7)
         cal.set(Calendar.HOUR_OF_DAY, 23)
         cal.set(Calendar.MINUTE, 59)
+        cal.set(Calendar.SECOND, 59)
         val proximaSemana = cal.timeInMillis
 
         viewLifecycleOwner.lifecycleScope.launch {
             db.orcamentoDao().listarVencimentosProximos(hoje, proximaSemana).collect { lista ->
-                if (lista.isNotEmpty()) {
-                    val totalValor = lista.sumOf { it.valor }
-                    val qtd = lista.size
+                // FILTRO ADICIONADO: Filtramos para considerar apenas itens do tipo DESPESA
+                val apenasDespesas = lista.filter { it.tipo == TipoLancamento.DESPESA }
+
+                if (apenasDespesas.isNotEmpty()) {
+                    val totalValor = apenasDespesas.sumOf { it.valor }
+                    val qtd = apenasDespesas.size
 
                     binding.cardAlertaVencimento.visibility = View.VISIBLE
                     binding.txtMensagemAlerta.text = if (qtd == 1) {
@@ -100,6 +109,7 @@ class AgendaFragment : Fragment() {
                         "Existem $qtd contas próximas totalizando ${formatarMoeda(totalValor)}"
                     }
                 } else {
+                    // Se não houver despesas (mesmo que haja receitas), o card desaparece
                     binding.cardAlertaVencimento.visibility = View.GONE
                 }
             }

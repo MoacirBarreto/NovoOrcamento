@@ -1,32 +1,38 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-
-# MPAndroidChart
+proguard
+# --------------------------------------------------------------------------
+# REGRAS DO MPAndroidChart (Gráficos)
+# --------------------------------------------------------------------------
+# Mantém a biblioteca de gráficos intacta para evitar que os eixos e dados sumam
 -keep class com.github.mikephil.charting.** { *; }
 -dontwarn com.github.mikephil.charting.**
 
-# Room
+# --------------------------------------------------------------------------
+# REGRAS DO ROOM (Banco de Dados)
+# --------------------------------------------------------------------------
+# O Room precisa encontrar as classes de banco de dados e modelos pelo nome real
+-keepclassmembers class * extends androidx.room.RoomDatabase {
+    public <init>(...);
+}
 -keep class * extends androidx.room.RoomDatabase
--dontwarn androidx.room.paging.**
+-dontwarn androidx.room.**
 
-# Gson (se você usar para salvar objetos)
--keep class com.google.gson.** { *; }
+# --------------------------------------------------------------------------
+# REGRAS PARA SEUS MODELOS (Lançamento, Categoria, Agenda, SaldoMensal)
+# --------------------------------------------------------------------------
+# Isso garante que o banco de dados consiga ler e escrever seus dados corretamente
+-keep class devandroid.moacir.Lume.model.** { *; }
+
+# --------------------------------------------------------------------------
+# REGRAS PARA KOTLIN COROUTINES (Processamento em segundo plano)
+# --------------------------------------------------------------------------
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidExceptionPreHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidDispatcherFactory {}
+-dontwarn kotlinx.coroutines.**
+
+# --------------------------------------------------------------------------
+# REGRAS PARA MATERIAL DESIGN 3
+# --------------------------------------------------------------------------
+-keep class com.google.android.material.** { *; }
+-dontwarn com.google.android.material.**

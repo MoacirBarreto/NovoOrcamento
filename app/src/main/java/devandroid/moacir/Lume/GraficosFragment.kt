@@ -82,21 +82,32 @@ class GraficosFragment : Fragment() {
         }
     }
 
+
     private fun carregarDadosGrafico(chipId: Int) {
         viewLifecycleOwner.lifecycleScope.launch {
             val (lista, categorias, evolucao) = withContext(Dispatchers.IO) {
                 val cal = Calendar.getInstance()
+
+                // Zera o calendário para o início do dia atual (00:00:00.000)
+                cal.set(Calendar.HOUR_OF_DAY, 0)
+                cal.set(Calendar.MINUTE, 0)
+                cal.set(Calendar.SECOND, 0)
+                cal.set(Calendar.MILLISECOND, 0)
+
                 val resultado = when (chipId) {
                     R.id.chipMesAtualGrafico -> {
+                        // Força para o primeiro dia do mês atual às 00:00:00
                         cal.set(Calendar.DAY_OF_MONTH, 1)
-                        db.orcamentoDao()
-                            .listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
+                        val inicioMes = cal.timeInMillis
+
+                        // Define o limite como o final do dia atual ou final do mês
+                        db.orcamentoDao().listarLancamentosPorPeriodo(inicioMes, Long.MAX_VALUE)
                     }
 
                     R.id.chip30DiasGrafico -> {
+                        // Subtrai 30 dias a partir de hoje às 00:00:00
                         cal.add(Calendar.DAY_OF_YEAR, -30)
-                        db.orcamentoDao()
-                            .listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
+                        db.orcamentoDao().listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
                     }
 
                     R.id.chipPorPeriodoGrafico -> {
@@ -108,6 +119,7 @@ class GraficosFragment : Fragment() {
 
                     else -> db.orcamentoDao().listarLancamentosSemFlow()
                 }
+
                 Triple(
                     resultado,
                     db.orcamentoDao().listarCategorias(),
@@ -121,7 +133,6 @@ class GraficosFragment : Fragment() {
             atualizarGraficoLinha(evolucao)
         }
     }
-
     private fun abrirSeletorDeData() {
         val builder = MaterialDatePicker.Builder.dateRangePicker()
         builder.setTitleText("Filtrar Gráficos")
@@ -132,16 +143,15 @@ class GraficosFragment : Fragment() {
             val dataFim = selection.second
 
             if (dataInicio != null && dataFim != null) {
+                // Compensação de fuso horário para garantir a data correta no Brasil
                 val offset = TimeZone.getDefault().getOffset(Date().time).toLong()
                 dataInicioPersonalizada = dataInicio + offset
-                dataFimPersonalizada = dataFim + offset + 86399999
+                dataFimPersonalizada = dataFim + offset + 86399999 // Final do dia
 
                 val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
                 binding.chipPorPeriodoGrafico.text =
                     "${formato.format(Date(dataInicioPersonalizada))} - ${
-                        formato.format(
-                            Date(dataFimPersonalizada)
-                        )
+                        formato.format(Date(dataFimPersonalizada))
                     }"
                 carregarDadosGrafico(R.id.chipPorPeriodoGrafico)
             }
@@ -156,6 +166,7 @@ class GraficosFragment : Fragment() {
         }
         val corTexto = obterCorTextoBase()
 
+        // Filtrar apenas os últimos 12 meses
         val formatoMesAno = SimpleDateFormat("yyyy-MM", Locale.US)
         val cal = Calendar.getInstance()
         val mesesPermitidos = mutableListOf<String>()
@@ -187,16 +198,15 @@ class GraficosFragment : Fragment() {
         val dataSet = LineDataSet(entries, "Evolução do Saldo").apply {
             color = corLume
             circleColors = coresCirculos
-            lineWidth = 1.5f
-            circleRadius = 4f
+            lineWidth = 2f
+            circleRadius = 5f
             valueTextColor = corTexto
             setDrawValues(true)
-
             setDrawFilled(true)
-
             fillColor = corLume
-            fillAlpha = 50
+            fillAlpha = 40
             mode = LineDataSet.Mode.LINEAR
+
         }
 
         binding.lineChart.apply {
@@ -209,28 +219,30 @@ class GraficosFragment : Fragment() {
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
                         val index = value.toInt()
-                        return if (index >= 0 && index < labelsX.size && value == index.toFloat()) labelsX[index] else ""
+                        return if (index >= 0 && index < labelsX.size) labelsX[index] else ""
                     }
                 }
             }
-            axisLeft.apply {
-                textColor = corTexto
-                setDrawGridLines(true)
-            }
+            axisLeft.textColor = corTexto
             setDrawBorders(false)
-            xAxis.setAvoidFirstLastClipping(true)
+            animateX(1000)
             invalidate()
         }
     }
 
     private fun atualizarGraficoBarras(lista: List<Lancamento>) {
-        val receitas =
-            lista.filter { it.tipo == TipoLancamento.RECEITA }.sumOf { it.valor }.toFloat()
-        val despesas =
-            lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf { it.valor }.toFloat()
-        val corTexto = obterCorTextoBase()
+        // Cálculo otimizado em uma única passagem
+        var totalReceitas = 0.0
+        var totalDespesas = 0.0
+        lista.forEach {
+            if (it.tipo == TipoLancamento.RECEITA) totalReceitas += it.valor
+            else totalDespesas += it.valor
+        }
 
-        val dataSet = BarDataSet(listOf(BarEntry(0f, receitas), BarEntry(1f, despesas)), "").apply {
+        val corTexto = obterCorTextoBase()
+        val dataSet = BarDataSet(
+            listOf(BarEntry(0f, totalReceitas.toFloat()), BarEntry(1f, totalDespesas.toFloat())), ""
+        ).apply {
             colors = listOf(Color.rgb(76, 175, 80), Color.rgb(244, 67, 54))
             valueFormatter = CurrencyFormatter()
             valueTextSize = 10f
@@ -354,11 +366,8 @@ class GraficosFragment : Fragment() {
     private fun formatarMesAno(mesAno: String): String {
         return try {
             val date = SimpleDateFormat("yyyy-MM", Locale.US).parse(mesAno)
-            // Força PT-BR para aparecer Abr/24 em vez de Apr/24
             SimpleDateFormat("MMM/yy", Locale("pt", "BR")).format(date!!)
-        } catch (e: Exception) {
-            mesAno
-        }
+        } catch (e: Exception) { mesAno }
     }
 
     private fun obterCorTextoBase(): Int {
