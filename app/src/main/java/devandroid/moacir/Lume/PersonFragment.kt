@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 
 import android.content.Context
 import android.content.Intent
@@ -11,9 +11,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import devandroid.moacir.Lume.database.AppDatabase
-import devandroid.moacir.Lume.databinding.FragmentPersonalizacaoBinding
-import devandroid.moacir.Lume.model.Categoria
+import com.moacir.Lume.database.AppDatabase
+import com.moacir.Lume.databinding.FragmentPersonalizacaoBinding
+import com.moacir.Lume.model.Categoria
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

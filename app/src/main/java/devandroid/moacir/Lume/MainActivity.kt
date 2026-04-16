@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 
 import android.os.Bundle
 import android.widget.Button
@@ -10,7 +10,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import devandroid.moacir.Lume.databinding.ActivityMainBinding
+import com.moacir.Lume.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

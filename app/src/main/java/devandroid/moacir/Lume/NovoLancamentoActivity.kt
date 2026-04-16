@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 
 import android.os.Bundle
 import android.text.Editable
@@ -10,12 +10,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.datepicker.MaterialDatePicker
-import devandroid.moacir.Lume.database.AppDatabase
-import devandroid.moacir.Lume.databinding.ActivityNovoLancamentoBinding
-import devandroid.moacir.Lume.model.Agenda
-import devandroid.moacir.Lume.model.Categoria
-import devandroid.moacir.Lume.model.Lancamento
-import devandroid.moacir.Lume.model.TipoLancamento
+import com.moacir.Lume.database.AppDatabase
+import com.moacir.Lume.databinding.ActivityNovoLancamentoBinding
+import com.moacir.Lume.model.Agenda
+import com.moacir.Lume.model.Categoria
+import com.moacir.Lume.model.Lancamento
+import com.moacir.Lume.model.TipoLancamento
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

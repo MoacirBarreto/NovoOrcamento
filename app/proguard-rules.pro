@@ -1,4 +1,4 @@
-proguard
+
 # --------------------------------------------------------------------------
 # REGRAS DO MPAndroidChart (Gráficos)
 # --------------------------------------------------------------------------
@@ -20,7 +20,7 @@ proguard
 # REGRAS PARA SEUS MODELOS (Lançamento, Categoria, Agenda, SaldoMensal)
 # --------------------------------------------------------------------------
 # Isso garante que o banco de dados consiga ler e escrever seus dados corretamente
--keep class devandroid.moacir.Lume.model.** { *; }
+-keep class com.moacir.Lume.model.** { *; }
 
 # --------------------------------------------------------------------------
 # REGRAS PARA KOTLIN COROUTINES (Processamento em segundo plano)

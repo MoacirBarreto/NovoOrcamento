@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume.database
+package com.moacir.Lume.database
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -7,10 +7,10 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
-import devandroid.moacir.Lume.model.Agenda
-import devandroid.moacir.Lume.model.Categoria
-import devandroid.moacir.Lume.model.Lancamento
-import devandroid.moacir.Lume.model.SaldoMensal
+import com.moacir.Lume.model.Agenda
+import com.moacir.Lume.model.Categoria
+import com.moacir.Lume.model.Lancamento
+import com.moacir.Lume.model.SaldoMensal
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "devandroid.moacir.Lume"
+    namespace = "com.moacir.Lume"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "devandroid.moacir.Lume"
+        applicationId = "com.moacir.Lume"
         minSdk = 29
         targetSdk = 35
         versionCode = 1 // Incremente para 2, 3... em cada nova versão da Play Store
@@ -31,6 +31,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 

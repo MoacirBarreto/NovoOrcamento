@@ -1,10 +1,10 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import devandroid.moacir.Lume.databinding.ItemAgendaBinding
-import devandroid.moacir.Lume.model.Agenda
+import com.moacir.Lume.databinding.ItemAgendaBinding
+import com.moacir.Lume.model.Agenda
 import java.text.SimpleDateFormat
 import java.util.Locale
 

@@ -1,12 +1,12 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import devandroid.moacir.Lume.databinding.ItemLancamentoBinding
-import devandroid.moacir.Lume.model.Lancamento
-import devandroid.moacir.Lume.model.TipoLancamento
+import com.moacir.Lume.databinding.ItemLancamentoBinding
+import com.moacir.Lume.model.Lancamento
+import com.moacir.Lume.model.TipoLancamento
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date

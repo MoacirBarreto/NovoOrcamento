@@ -1,13 +1,13 @@
-package devandroid.moacir.Lume.database
+package com.moacir.Lume.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import devandroid.moacir.Lume.model.Agenda
-import devandroid.moacir.Lume.model.Categoria
-import devandroid.moacir.Lume.model.Lancamento
+import com.moacir.Lume.model.Agenda
+import com.moacir.Lume.model.Categoria
+import com.moacir.Lume.model.Lancamento
 
 @Database(
     entities = [Categoria::class, Lancamento::class, Agenda::class],

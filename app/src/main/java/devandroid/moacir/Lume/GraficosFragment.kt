@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 
 import android.content.pm.ActivityInfo
 import android.graphics.Color
@@ -23,12 +23,12 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.datepicker.MaterialDatePicker
-import devandroid.moacir.Lume.database.AppDatabase
-import devandroid.moacir.Lume.databinding.FragmentGraficosBinding
-import devandroid.moacir.Lume.model.Categoria
-import devandroid.moacir.Lume.model.Lancamento
-import devandroid.moacir.Lume.model.SaldoMensal
-import devandroid.moacir.Lume.model.TipoLancamento
+import com.moacir.Lume.database.AppDatabase
+import com.moacir.Lume.databinding.FragmentGraficosBinding
+import com.moacir.Lume.model.Categoria
+import com.moacir.Lume.model.Lancamento
+import com.moacir.Lume.model.SaldoMensal
+import com.moacir.Lume.model.TipoLancamento
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

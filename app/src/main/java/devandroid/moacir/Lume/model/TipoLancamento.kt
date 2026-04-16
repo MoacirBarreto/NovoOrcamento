@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume.model
+package com.moacir.Lume.model
 
 enum class TipoLancamento {
     RECEITA,

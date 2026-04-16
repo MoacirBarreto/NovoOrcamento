@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume.model
+package com.moacir.Lume.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

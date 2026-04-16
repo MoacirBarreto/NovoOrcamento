@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume.model
+package com.moacir.Lume.model
 
 /**
  * Usamos 'data class' e colocamos as variáveis dentro dos parênteses ().

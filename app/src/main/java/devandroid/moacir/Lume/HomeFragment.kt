@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,10 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
-import devandroid.moacir.Lume.database.AppDatabase
-import devandroid.moacir.Lume.databinding.FragmentHomeBinding
-import devandroid.moacir.Lume.model.Lancamento
-import devandroid.moacir.Lume.model.TipoLancamento
+import com.moacir.Lume.database.AppDatabase
+import com.moacir.Lume.databinding.FragmentHomeBinding
+import com.moacir.Lume.model.Lancamento
+import com.moacir.Lume.model.TipoLancamento
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

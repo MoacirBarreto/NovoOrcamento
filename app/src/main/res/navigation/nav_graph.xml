@@ -8,28 +8,28 @@
     <!-- Tela Inicial -->
     <fragment
         android:id="@+id/homeFragment"
-        android:name="devandroid.moacir.Lume.HomeFragment"
+        android:name="com.moacir.Lume.HomeFragment"
         android:label="Lançamentos"
         tools:layout="@layout/fragment_home" />
 
     <!-- Tela de Agenda -->
     <fragment
         android:id="@+id/agendaFragment"
-        android:name="devandroid.moacir.Lume.AgendaFragment"
+        android:name="com.moacir.Lume.AgendaFragment"
         android:label="Agenda"
         tools:layout="@layout/fragment_agenda" />
 
     <!-- Tela de Gráficos -->
     <fragment
         android:id="@+id/graficosFragment"
-        android:name="devandroid.moacir.Lume.GraficosFragment"
+        android:name="com.moacir.Lume.GraficosFragment"
         android:label="Gráficos"
         tools:layout="@layout/fragment_graficos" />
 
     <!-- Tela de Personalização -->
     <fragment
         android:id="@+id/personFragment"
-        android:name="devandroid.moacir.Lume.PersonFragment"
+        android:name="com.moacir.Lume.PersonFragment"
         android:label="Personalizar"
         tools:layout="@layout/fragment_personalizacao" />
 
