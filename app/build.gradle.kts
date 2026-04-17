@@ -12,8 +12,8 @@ android {
         applicationId = "com.moacir.Lume"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1 // Incremente para 2, 3... em cada nova versão da Play Store
-        versionName = "1.0"
+        versionCode = 2 // Incremente para 2, 3... em cada nova versão da Play Store
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -31,7 +31,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+           // signingConfig = signingConfigs.getByName("debug")
+
         }
     }
 

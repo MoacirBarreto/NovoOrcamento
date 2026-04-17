@@ -275,7 +275,21 @@ class GraficosFragment : Fragment() {
             }
 
         val dataSet = PieDataSet(entries, "").apply {
-            colors = ColorTemplate.MATERIAL_COLORS.toList()
+            // --- ALTERAÇÃO AQUI: Paleta Expandida de 10 cores ---
+            colors = listOf(
+                Color.rgb(103, 58, 183),  // Roxo (Deep Purple)
+                Color.rgb(33, 150, 243),  // Azul (Blue)
+                Color.rgb(0, 150, 136),   // Teai (Verde Água)
+                Color.rgb(255, 193, 7),   // Âmbar (Amarelo)
+                Color.rgb(233, 30, 99),   // Rosa (Pink)
+                Color.rgb(156, 39, 176),  // Violeta
+                Color.rgb(0, 188, 212),   // Ciano
+                Color.rgb(139, 195, 74),  // Lima
+                Color.rgb(255, 87, 34),   // Laranja Profundo
+                Color.rgb(96, 125, 139)   // Cinza Azulado (Blue Grey)
+            )
+            // ---------------------------------------------------
+
             yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
             valueTextSize = 11f
             sliceSpace = 3f
@@ -292,6 +306,8 @@ class GraficosFragment : Fragment() {
             setUsePercentValues(true)
             setEntryLabelColor(corTexto)
             legend.textColor = corTexto
+            // Melhora a visualização
+            legend.isWordWrapEnabled = true
             animateXY(800, 800)
             invalidate()
         }
