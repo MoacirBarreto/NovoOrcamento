@@ -12,9 +12,8 @@ android {
         applicationId = "com.moacir.Lume"
         minSdk = 29
         targetSdk = 35
-        versionCode = 5 // Incremente para 2, 3... em cada nova versão da Play Store
-        versionName = "1.5"
-
+        versionCode = 6 // Incremente para 2, 3... em cada nova versão da Play Store
+        versionName = "1.6.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ksp {
