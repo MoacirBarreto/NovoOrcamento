@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="transparent">#00000000</color>
+
     <!-- Cores Principais (Lume) -->
     <color name="lume_orange_primary">#FF9800</color>
     <color name="lume_orange_light">#FFB74D</color>
