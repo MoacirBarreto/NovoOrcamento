@@ -1,4 +1,4 @@
-package com.moacir.Lume
+package devandroid.moacir.Lume
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,6 +11,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.moacir.Lume.R
 
 class LancamentoAdapter(
     private val listaLancamentos: List<Lancamento>,
