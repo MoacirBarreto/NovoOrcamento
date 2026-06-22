@@ -1,4 +1,4 @@
-package com.moacir.Lume
+package devandroid.moacir.Lume
 
 import android.content.pm.ActivityInfo
 import android.graphics.Color
@@ -22,6 +22,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.moacir.Lume.R
 import com.moacir.Lume.database.AppDatabase
 import com.moacir.Lume.databinding.FragmentGraficosBinding
 import com.moacir.Lume.model.Categoria

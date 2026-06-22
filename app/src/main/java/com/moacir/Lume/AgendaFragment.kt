@@ -1,4 +1,4 @@
-package com.moacir.Lume
+package devandroid.moacir.Lume
 
 import android.content.Intent
 import android.os.Bundle
@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Locale
+import com.moacir.Lume.R
 
 class AgendaFragment : Fragment() {
 
