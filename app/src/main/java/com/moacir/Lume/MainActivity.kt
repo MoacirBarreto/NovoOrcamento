@@ -4,8 +4,12 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.CheckBox
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -17,14 +21,13 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
-
-    // Flag para controlar se o diálogo já foi exibido nesta sessão (viva) da Activity
     private var dialogoJaExibidoNestaSessao = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 1. Ativa o modo de ponta a ponta (Obrigatório SDK 35)
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        // 1. Recupera o estado se a tela foi girada
         if (savedInstanceState != null) {
             dialogoJaExibidoNestaSessao = savedInstanceState.getBoolean("dialogo_exibido", false)
         }
@@ -32,7 +35,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 2. Configuração da Toolbar e Navigation
+        // 2. Ajuste de Recuos (Insets)
+        // Aplicamos o recuo no root para que o conteúdo não fique atrás da barra de status ou de navegação
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // Aplicamos padding no topo para a StatusBar e embaixo para a NavigationBar
+            v.updatePadding(
+                top = insets.top,
+                bottom = insets.bottom
+            )
+            windowInsets
+        }
+
+        // 3. Configuração da Toolbar e Navigation
         setSupportActionBar(binding.topAppBar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setIcon(R.drawable.ic_toolbar_logo)
@@ -53,18 +69,25 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.bottomNavigation.setupWithNavController(navController)
 
-        navController.addOnDestinationChangedListener { _, _, _ ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.graficosFragment) {
+                // Trava em Vertical (Portrait) quando entrar nos Gráficos
+                requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            } else {
+                // Libera para rotacionar (ou volta ao padrão) nas outras telas
+                requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            }
+
+            // Mantém o título padrão da Toolbar
             supportActionBar?.title = "LUME"
             binding.topAppBar.title = "LUME"
         }
 
-        // 3. Só verifica o Boas Vindas se ainda não foi exibido NESTA sessão
         if (!dialogoJaExibidoNestaSessao) {
             verificarBoasVindas()
         }
     }
 
-    // 4. Salva o estado da flag antes de destruir a Activity (rotação)
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean("dialogo_exibido", dialogoJaExibidoNestaSessao)
@@ -94,6 +117,7 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
             .create()
 
+        // Garante que o fundo do diálogo seja transparente para não conflitar com o Edge-to-Edge
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         val chkNaoMostrar = dialogView.findViewById<CheckBox>(R.id.chkNaoMostrarNovamente)
@@ -103,7 +127,6 @@ class MainActivity : AppCompatActivity() {
             if (chkNaoMostrar.isChecked) {
                 prefs.edit().putBoolean("exibir_boas_vindas", false).apply()
             }
-            // Importante: Marcar como exibido para que o giro de tela não o traga de volta
             dialogoJaExibidoNestaSessao = true
             dialog.dismiss()
         }

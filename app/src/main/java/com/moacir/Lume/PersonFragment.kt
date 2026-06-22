@@ -1,4 +1,4 @@
-package com.moacir.Lume
+package devandroid.moacir.Lume
 
 import android.content.Context
 import android.content.Intent
@@ -17,6 +17,7 @@ import com.moacir.Lume.model.Categoria
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.moacir.Lume.R
 
 class PersonFragment : Fragment() {
 
