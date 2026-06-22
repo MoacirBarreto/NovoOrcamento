@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -11,9 +11,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.moacir.Lume.R
 import com.moacir.Lume.databinding.ActivityMainBinding
-
 
 class MainActivity : AppCompatActivity() {
 
