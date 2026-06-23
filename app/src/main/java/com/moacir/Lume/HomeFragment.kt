@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 import com.moacir.Lume.R
 
 import android.content.Intent

@@ -1,4 +1,4 @@
-package devandroid.moacir.Lume
+package com.moacir.Lume
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

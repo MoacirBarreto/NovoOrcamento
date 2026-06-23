@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
     android:fitsSystemWindows="true"
-    tools:context="devandroid.moacir.Lume.MainActivity">
+    tools:context="com.moacir.Lume.MainActivity">
 
     <!-- BARRA DE TÍTULO (MATERIAL 3) -->
     <com.google.android.material.appbar.AppBarLayout
