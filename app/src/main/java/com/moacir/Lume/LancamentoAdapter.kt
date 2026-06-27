@@ -11,6 +11,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.moacir.Lume.R
 
 class LancamentoAdapter(
     private val listaLancamentos: List<Lancamento>,

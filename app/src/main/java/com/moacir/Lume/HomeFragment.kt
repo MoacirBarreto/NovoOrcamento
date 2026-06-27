@@ -1,4 +1,5 @@
 package com.moacir.Lume
+import com.moacir.Lume.R
 
 import android.content.Intent
 import android.os.Bundle

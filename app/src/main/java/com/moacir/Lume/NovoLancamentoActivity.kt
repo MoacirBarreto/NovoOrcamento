@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
+import com.moacir.Lume.R
 
 class NovoLancamentoActivity : AppCompatActivity() {
 
