@@ -2,6 +2,7 @@ package com.moacir.Lume
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,7 +18,6 @@ import com.moacir.Lume.model.Categoria
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.moacir.Lume.R
 
 class PersonFragment : Fragment() {
 
@@ -39,7 +39,34 @@ class PersonFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         db = AppDatabase.getDatabase(requireContext())
         configurarCliques()
+
+        exibirVersaoDoApp(view)
     }
+
+    private fun exibirVersaoDoApp(view: View) {
+        try {
+            val context = requireContext()
+            val packageInfo =
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getPackageInfo(
+                        context.packageName,
+                        PackageManager.PackageInfoFlags.of(0)
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    context.packageManager.getPackageInfo(context.packageName, 0)
+                }
+
+            val versionName = packageInfo.versionName
+
+            // Usando View Binding para encontrar o TextView que você criou no XML
+            binding.txtVersaoApp.text = "Versão $versionName"
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 
     private fun configurarCliques() {
         // 1. Clique para Gerenciar Categorias (Abre um diálogo ou lógica de edição)
