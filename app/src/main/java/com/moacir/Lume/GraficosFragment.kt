@@ -12,12 +12,15 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.moacir.Lume.database.AppDatabase
 import com.moacir.Lume.databinding.FragmentGraficosBinding
+import com.moacir.Lume.model.CategoriaResumo
 import com.moacir.Lume.model.SaldoMensal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,12 +30,20 @@ class GraficosFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var database: AppDatabase
 
+    // Variáveis para filtro de data
+    private var dataInicioPersonalizada: Long = 0L
+    private var dataFimPersonalizada: Long = 0L
+
     // Paleta de Cores Oficial LUME
     private val corLaranjaLume = Color.parseColor("#EF6C00")
     private val corMarromLume = Color.parseColor("#5D4037")
     private val corMarromEscuro = Color.parseColor("#3E2723")
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentGraficosBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -42,14 +53,17 @@ class GraficosFragment : Fragment() {
         database = AppDatabase.getDatabase(requireContext())
 
         configurarEstilosIniciais()
-        observarDadosReais()
+        configurarFiltros()
+
+        // Seleciona o mês atual por padrão na inicialização
+        binding.chipMesAtualGrafico.isChecked = true
+        processarFiltro(R.id.chipMesAtualGrafico)
     }
 
     private fun configurarEstilosIniciais() {
         val corTexto = obterCorTextoTema()
-        val msgVazio = "Aguardando dados..."
+        val msgVazio = "Sem dados para o período"
 
-        // --- Estilo Barras ---
         with(binding.chartBar) {
             description.isEnabled = false
             setNoDataText(msgVazio)
@@ -62,7 +76,6 @@ class GraficosFragment : Fragment() {
             legend.textColor = corTexto
         }
 
-        // --- Estilo Linhas ---
         with(binding.chartLine) {
             description.isEnabled = false
             setNoDataText(msgVazio)
@@ -73,12 +86,9 @@ class GraficosFragment : Fragment() {
             axisLeft.textColor = corTexto
             axisRight.isEnabled = false
             legend.textColor = corTexto
-
-            // Ativa o balão de valor personalizado que você criou
             marker = CustomMarkerView(requireContext(), R.layout.marker_view)
         }
 
-        // --- Estilo Pizza ---
         with(binding.chartPie) {
             description.isEnabled = false
             setNoDataText(msgVazio)
@@ -90,38 +100,138 @@ class GraficosFragment : Fragment() {
         }
     }
 
-    private fun observarDadosReais() {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            // Datas do mês atual para as Barras
-            val cal = Calendar.getInstance()
-            cal.set(Calendar.DAY_OF_MONTH, 1)
-            val inicio = cal.timeInMillis
-            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
-            val fim = cal.timeInMillis
+    private fun configurarFiltros() {
+        // IDs ajustados para o fragment_graficos.xml fornecido
+        binding.chipGroupFiltrosGrafico.setOnCheckedStateChangeListener { _, checkedIds ->
+            if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
 
+            val chipId = checkedIds[0]
+            if (chipId == R.id.chipPorPeriodoGrafico) {
+                abrirSeletorDeData()
+            } else {
+                processarFiltro(chipId)
+            }
+        }
+    }
+
+    private fun abrirSeletorDeData() {
+        val builder = MaterialDatePicker.Builder.dateRangePicker()
+        builder.setTitleText("Selecione o Período")
+        val picker = builder.build()
+
+        picker.addOnPositiveButtonClickListener { selection ->
+            val dataInicio = selection.first
+            val dataFim = selection.second
+
+            if (dataInicio != null && dataFim != null) {
+                val offset = TimeZone.getDefault().getOffset(Date().time).toLong()
+                dataInicioPersonalizada = dataInicio + offset
+                dataFimPersonalizada = dataFim + offset + 86399999
+
+                val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
+                binding.chipPorPeriodoGrafico.text =
+                    "${formato.format(Date(dataInicioPersonalizada))} - ${
+                        formato.format(Date(dataFimPersonalizada))
+                    }"
+
+                observarDadosReais(dataInicioPersonalizada, dataFimPersonalizada)
+            }
+        }
+        picker.addOnNegativeButtonClickListener { binding.chipMesAtualGrafico.isChecked = true }
+        picker.show(parentFragmentManager, "DATE_PICKER_GRAFICOS")
+    }
+
+    private fun processarFiltro(chipId: Int) {
+        val calendario = Calendar.getInstance()
+        calendario.set(Calendar.HOUR_OF_DAY, 0)
+        calendario.set(Calendar.MINUTE, 0)
+        calendario.set(Calendar.SECOND, 0)
+        calendario.set(Calendar.MILLISECOND, 0)
+
+        val agora = Calendar.getInstance().timeInMillis
+        var inicio: Long = 0L
+        var fim: Long = agora
+
+        when (chipId) {
+            R.id.chipMesAtualGrafico -> {
+                calendario.set(Calendar.DAY_OF_MONTH, 1)
+                inicio = calendario.timeInMillis
+                binding.chipPorPeriodoGrafico.text = "Período"
+            }
+            R.id.chip30DiasGrafico -> {
+                calendario.add(Calendar.DAY_OF_YEAR, -30)
+                inicio = calendario.timeInMillis
+                binding.chipPorPeriodoGrafico.text = "Período"
+            }
+        }
+        observarDadosReais(inicio, fim)
+    }
+
+    private fun observarDadosReais(inicio: Long, fim: Long) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val resumo = database.orcamentoDao().obterResumoFinanceiro(inicio, fim)
 
-            // Observa a evolução do saldo (Flow)
+            // BUSCA DADOS REAIS PARA A PIZZA
+            val despesasPorCategoria = database.orcamentoDao().obterDespesasPorCategoria(inicio, fim)
+
             database.orcamentoDao().obterEvolucaoSaldo().collect { listaSaldo ->
                 withContext(Dispatchers.Main) {
                     if (_binding != null) {
+                        atualizarCardResumo(resumo.receitas, resumo.despesas)
                         atualizarBarras(resumo.receitas.toFloat(), resumo.despesas.toFloat())
                         atualizarLinhas(listaSaldo)
-                        atualizarPizzaSimulada() // Implementar query de categorias no futuro
+
+                        // ENVIA OS DADOS REAIS PARA O GRÁFICO
+                        atualizarPizzaReal(despesasPorCategoria)
                     }
                 }
             }
         }
     }
 
+    private fun atualizarPizzaReal(dados: List<CategoriaResumo>) {
+        if (dados.isEmpty()) {
+            binding.chartPie.clear()
+            binding.chartPie.setNoDataText("Sem despesas no período")
+            return
+        }
+
+        val entries = dados.map { PieEntry(it.valor.toFloat(), it.nome) }
+
+        val dataSet = PieDataSet(entries, "").apply {
+            // Usa as cores oficiais do app e repete se houver muitas categorias
+            colors = listOf(corLaranjaLume, corMarromLume, corMarromEscuro, Color.LTGRAY, Color.GRAY)
+            valueTextColor = Color.WHITE
+            valueTextSize = 12f
+            sliceSpace = 3f
+        }
+
+        binding.chartPie.apply {
+            data = PieData(dataSet).apply {
+                setValueFormatter(PercentFormatter(binding.chartPie))
+            }
+            animateY(1000, Easing.EaseInOutQuad)
+            invalidate()
+        }
+    }
+    private fun atualizarCardResumo(receitas: Double, despesas: Double) {
+        val formato = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+        val saldo = receitas - despesas
+
+        binding.txtTotalReceitasGrafico.text = formato.format(receitas)
+        binding.txtTotalDespesasGrafico.text = formato.format(despesas)
+        binding.txtSaldoFinalGrafico.text = formato.format(saldo)
+    }
+
     private fun atualizarBarras(receitas: Float, despesas: Float) {
         if (receitas == 0f && despesas == 0f) {
             binding.chartBar.clear()
+            binding.chartBar.setNoDataText("Sem lançamentos neste período")
             return
         }
 
         val entries = listOf(BarEntry(0f, receitas), BarEntry(1f, despesas))
-        val dataSet = BarDataSet(entries, "Resumo Mensal").apply {
+        val dataSet = BarDataSet(entries, "Receitas vs Despesas").apply {
             colors = listOf(Color.parseColor("#4CAF50"), Color.parseColor("#F44336"))
             valueTextColor = obterCorTextoTema()
             valueTextSize = 10f
@@ -130,6 +240,7 @@ class GraficosFragment : Fragment() {
         binding.chartBar.apply {
             data = BarData(dataSet).apply { barWidth = 0.5f }
             xAxis.valueFormatter = IndexAxisValueFormatter(listOf("Receita", "Despesa"))
+            xAxis.granularity = 1f
             animateY(1000)
             invalidate()
         }
@@ -144,7 +255,7 @@ class GraficosFragment : Fragment() {
         val entries = dados.mapIndexed { i, s -> Entry(i.toFloat(), s.saldo.toFloat()) }
         val labels = gerarLabelsMeses(dados.size)
 
-        val dataSet = LineDataSet(entries, "Evolução do Saldo").apply {
+        val dataSet = LineDataSet(entries, "Saldo Acumulado").apply {
             color = corLaranjaLume
             setCircleColor(corMarromLume)
             lineWidth = 3f
@@ -154,7 +265,7 @@ class GraficosFragment : Fragment() {
             mode = LineDataSet.Mode.LINEAR
             setDrawFilled(true)
             fillColor = corLaranjaLume
-            fillAlpha = 50 // Transparência para o fundo da linha
+            fillAlpha = 50
             valueTextColor = obterCorTextoTema()
         }
 
@@ -162,31 +273,8 @@ class GraficosFragment : Fragment() {
             data = LineData(dataSet)
             xAxis.valueFormatter = IndexAxisValueFormatter(labels)
             xAxis.labelRotationAngle = -45f
+            xAxis.granularity = 1f
             animateX(1000)
-            invalidate()
-        }
-    }
-
-    private fun atualizarPizzaSimulada() {
-        val entries = ArrayList<PieEntry>().apply {
-            add(PieEntry(40f, "Essencial"))
-            add(PieEntry(30f, "Lazer"))
-            add(PieEntry(30f, "Investimento"))
-        }
-
-        val dataSet = PieDataSet(entries, "").apply {
-            colors = listOf(corLaranjaLume, corMarromLume, corMarromEscuro)
-            valueTextColor = Color.WHITE
-            valueTextSize = 12f
-            sliceSpace = 3f
-        }
-
-        binding.chartPie.apply {
-            // 'this' here refers to binding.chartPie
-            // Alternatively, the most robust way:
-            data = PieData(dataSet).apply { setValueFormatter(PercentFormatter(binding.chartPie)) }
-
-            animateY(1000, Easing.EaseInOutQuad)
             invalidate()
         }
     }

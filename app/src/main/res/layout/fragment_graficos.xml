@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     android:background="?attr/colorSurface"
+    android:fillViewport="true"
     tools:context=".GraficosFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,11 +19,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainer"
             app:cardCornerRadius="16dp"
             app:cardElevation="2dp"
-            app:strokeWidth="0dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainer"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -38,12 +38,14 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/receitas"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp" />
+
                     <TextView
                         android:id="@+id/txtTotalReceitasGrafico"
                         android:layout_width="wrap_content"
@@ -60,12 +62,14 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/despesas"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp" />
+
                     <TextView
                         android:id="@+id/txtTotalDespesasGrafico"
                         android:layout_width="wrap_content"
@@ -82,12 +86,14 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/saldo"
-                        android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp" />
+
                     <TextView
                         android:id="@+id/txtSaldoFinalGrafico"
                         android:layout_width="wrap_content"
@@ -106,11 +112,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            app:selectionRequired="true"
-            app:singleSelection="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardResumoGrafico">
+            app:layout_constraintTop_toBottomOf="@id/cardResumoGrafico"
+            app:selectionRequired="true"
+            app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipMesAtualGrafico"
