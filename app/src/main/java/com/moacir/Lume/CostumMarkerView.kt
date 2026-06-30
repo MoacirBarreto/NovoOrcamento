@@ -8,7 +8,6 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 import java.text.NumberFormat
 import java.util.Locale
-
 class CustomMarkerView(context: Context, layoutResource: Int) : MarkerView(context, layoutResource) {
 
     private val tvContent: TextView = findViewById(R.id.tvContent)

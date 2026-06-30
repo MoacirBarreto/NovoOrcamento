@@ -3,6 +3,7 @@ package com.moacir.Lume.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -19,6 +20,9 @@ interface OrcamentoDao {
 
     @Upsert
     suspend fun upsertLancamento(lancamento: Lancamento)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun inserirCategoriasIniciais(categorias: List<Categoria>)
 
     @Insert
     fun inserirCategoria(categoria: Categoria)
