@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PersonFragment : Fragment() {
-
     private var _binding: FragmentPersonalizacaoBinding? = null
     private val binding get() = _binding!!
     private lateinit var db: AppDatabase
@@ -58,8 +57,6 @@ class PersonFragment : Fragment() {
                 }
 
             val versionName = packageInfo.versionName
-
-            // Usando View Binding para encontrar o TextView que você criou no XML
             binding.txtVersaoApp.text = "Versão $versionName"
 
         } catch (e: Exception) {
@@ -69,22 +66,18 @@ class PersonFragment : Fragment() {
 
 
     private fun configurarCliques() {
-        // 1. Clique para Gerenciar Categorias (Abre um diálogo ou lógica de edição)
         binding.btnCategorias.setOnClickListener {
             exibirDialogoGerenciarCategorias()
         }
 
-        // 2. Clique para Resetar Tutorial de Boas-Vindas
         binding.btnResetBoasVindas.setOnClickListener {
             exibirDialogoReativarBoasVindas()
         }
 
-        // 3. Clique para Avaliar na Play Store
         binding.btnAvaliar.setOnClickListener {
             abrirPlayStoreParaAvaliar()
         }
 
-        // 4. Cliques de Monetização / Premium (Cards e Botões Pro)
         binding.cardPremium.setOnClickListener { exibirDialogoPremium() }
         binding.btnSejaPro.setOnClickListener { exibirDialogoPremium() }
         binding.btnExportarPDF.setOnClickListener { exibirDialogoPremium() }

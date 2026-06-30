@@ -19,7 +19,6 @@ class CustomMarkerView(context: Context, layoutResource: Int) : MarkerView(conte
     }
 
     override fun getOffset(): MPPointF {
-        // Ajusta o balão para ficar centralizado acima do ponto
         return MPPointF((-(width / 2)).toFloat(), (-height).toFloat())
     }
 }

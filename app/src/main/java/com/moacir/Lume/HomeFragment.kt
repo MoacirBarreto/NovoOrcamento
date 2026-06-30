@@ -1,5 +1,4 @@
 package com.moacir.Lume
-import com.moacir.Lume.R
 
 import android.content.Intent
 import android.os.Bundle
@@ -183,7 +182,6 @@ class HomeFragment : Fragment() {
         binding.txtTotalDespesas.text = formato.format(totalDespesas)
         binding.txtSaldoFinal.text = formato.format(saldo)
 
-        // Define a cor do saldo (Verde para positivo, Vermelho para negativo)
         val cor = if (saldo >= 0) R.color.green else R.color.red
         binding.txtSaldoFinal.setTextColor(ContextCompat.getColor(requireContext(), cor))
     }

@@ -13,7 +13,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- CARD PRO (MONETIZAÇÃO) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPremium"
             android:layout_width="match_parent"
@@ -79,7 +78,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- SEÇÃO: AJUSTES -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,7 +100,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- GERENCIAR CATEGORIAS -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCategorias"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
@@ -121,7 +118,6 @@
                     android:layout_marginHorizontal="16dp"
                     android:background="?attr/colorOutlineVariant" />
 
-                <!-- EXPORTAR DADOS -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnExportarPDF"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
@@ -137,7 +133,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- SEÇÃO: SOBRE -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -159,7 +154,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- AVALIAR APP -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAvaliar"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
@@ -178,7 +172,6 @@
                     android:layout_marginHorizontal="16dp"
                     android:background="?attr/colorOutlineVariant" />
 
-                <!-- RESET BOAS VINDAS -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnResetBoasVindas"
                     style="@style/Widget.Material3.Button.TextButton.Icon"

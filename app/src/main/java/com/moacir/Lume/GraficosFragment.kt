@@ -9,7 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -22,7 +30,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class GraficosFragment : Fragment() {
 
@@ -30,11 +41,9 @@ class GraficosFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var database: AppDatabase
 
-    // Variáveis para filtro de data
     private var dataInicioPersonalizada: Long = 0L
     private var dataFimPersonalizada: Long = 0L
 
-    // Paleta de Cores Oficial LUME
     private val corLaranjaLume = Color.parseColor("#EF6C00")
     private val corMarromLume = Color.parseColor("#5D4037")
     private val corMarromEscuro = Color.parseColor("#3E2723")
@@ -101,7 +110,6 @@ class GraficosFragment : Fragment() {
     }
 
     private fun configurarFiltros() {
-        // IDs ajustados para o fragment_graficos.xml fornecido
         binding.chipGroupFiltrosGrafico.setOnCheckedStateChangeListener { _, checkedIds ->
             if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
 
@@ -158,6 +166,7 @@ class GraficosFragment : Fragment() {
                 inicio = calendario.timeInMillis
                 binding.chipPorPeriodoGrafico.text = "Período"
             }
+
             R.id.chip30DiasGrafico -> {
                 calendario.add(Calendar.DAY_OF_YEAR, -30)
                 inicio = calendario.timeInMillis
@@ -171,8 +180,8 @@ class GraficosFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val resumo = database.orcamentoDao().obterResumoFinanceiro(inicio, fim)
 
-            // BUSCA DADOS REAIS PARA A PIZZA
-            val despesasPorCategoria = database.orcamentoDao().obterDespesasPorCategoria(inicio, fim)
+            val despesasPorCategoria =
+                database.orcamentoDao().obterDespesasPorCategoria(inicio, fim)
 
             database.orcamentoDao().obterEvolucaoSaldo().collect { listaSaldo ->
                 withContext(Dispatchers.Main) {
@@ -180,8 +189,6 @@ class GraficosFragment : Fragment() {
                         atualizarCardResumo(resumo.receitas, resumo.despesas)
                         atualizarBarras(resumo.receitas.toFloat(), resumo.despesas.toFloat())
                         atualizarLinhas(listaSaldo)
-
-                        // ENVIA OS DADOS REAIS PARA O GRÁFICO
                         atualizarPizzaReal(despesasPorCategoria)
                     }
                 }
@@ -199,8 +206,8 @@ class GraficosFragment : Fragment() {
         val entries = dados.map { PieEntry(it.valor.toFloat(), it.nome) }
 
         val dataSet = PieDataSet(entries, "").apply {
-            // Usa as cores oficiais do app e repete se houver muitas categorias
-            colors = listOf(corLaranjaLume, corMarromLume, corMarromEscuro, Color.LTGRAY, Color.GRAY)
+            colors =
+                listOf(corLaranjaLume, corMarromLume, corMarromEscuro, Color.LTGRAY, Color.GRAY)
             valueTextColor = Color.WHITE
             valueTextSize = 12f
             sliceSpace = 3f
@@ -214,6 +221,7 @@ class GraficosFragment : Fragment() {
             invalidate()
         }
     }
+
     private fun atualizarCardResumo(receitas: Double, despesas: Double) {
         val formato = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
         val saldo = receitas - despesas
@@ -293,7 +301,8 @@ class GraficosFragment : Fragment() {
     }
 
     private fun obterCorTextoTema(): Int {
-        val uiMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        val uiMode =
+            resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
         return if (uiMode == android.content.res.Configuration.UI_MODE_NIGHT_YES) Color.WHITE else corMarromEscuro
     }
 

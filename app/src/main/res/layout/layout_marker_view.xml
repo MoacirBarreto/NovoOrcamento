@@ -3,15 +3,15 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/fade_blue"
-    android:padding="8dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/tvContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/RS_0"
         android:textColor="@android:color/white"
         android:textSize="12sp"
-        android:textStyle="bold"
-        android:text="@string/RS_0" />
+        android:textStyle="bold" />
 </LinearLayout>

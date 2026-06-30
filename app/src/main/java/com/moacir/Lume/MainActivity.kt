@@ -34,13 +34,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // 2. Ajuste de Recuos (Insets)
-        // Aplicamos o recuo no root para que o conteúdo não fique atrás da barra de status ou de navegação
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            // Aplicamos padding no topo para a StatusBar e embaixo para a NavigationBar
             v.updatePadding(
                 top = insets.top,
                 bottom = insets.bottom
@@ -48,7 +43,6 @@ class MainActivity : AppCompatActivity() {
             windowInsets
         }
 
-        // 3. Configuração da Toolbar e Navigation
         setSupportActionBar(binding.topAppBar)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setIcon(R.drawable.ic_toolbar_logo)
@@ -75,10 +69,9 @@ class MainActivity : AppCompatActivity() {
                 requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             } else {
                 // Libera para rotacionar (ou volta ao padrão) nas outras telas
-                requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                requestedOrientation =
+                    android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             }
-
-            // Mantém o título padrão da Toolbar
             supportActionBar?.title = "LUME"
             binding.topAppBar.title = "LUME"
         }
@@ -116,8 +109,6 @@ class MainActivity : AppCompatActivity() {
             .setView(dialogView)
             .setCancelable(false)
             .create()
-
-        // Garante que o fundo do diálogo seja transparente para não conflitar com o Edge-to-Edge
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         val chkNaoMostrar = dialogView.findViewById<CheckBox>(R.id.chkNaoMostrarNovamente)

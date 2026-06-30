@@ -21,7 +21,6 @@ import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Locale
-import com.moacir.Lume.R
 
 class AgendaFragment : Fragment() {
 
