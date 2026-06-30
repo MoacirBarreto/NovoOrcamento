@@ -38,8 +38,23 @@ class PersonFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         db = AppDatabase.getDatabase(requireContext())
         configurarCliques()
-
         exibirVersaoDoApp(view)
+        binding.btnPoliticaPrivacidade.setOnClickListener {
+            abrirLink("https://sites.google.com/view/lume-app-privacidade/inicio")
+        }
+        binding.btnVideoDemonstracao.setOnClickListener {
+            abrirLink("https://www.youtube.com/watch?v=31GiE_RpAMM")
+        }
+    }
+
+    private fun abrirLink(url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Não foi possível abrir o link", Toast.LENGTH_SHORT)
+                .show()
+        }
     }
 
     private fun exibirVersaoDoApp(view: View) {
@@ -63,7 +78,6 @@ class PersonFragment : Fragment() {
             e.printStackTrace()
         }
     }
-
 
     private fun configurarCliques() {
         binding.btnCategorias.setOnClickListener {
@@ -143,7 +157,6 @@ class PersonFragment : Fragment() {
             }
         }
     }
-
 
     private fun reiniciarParaPadrao() {
         viewLifecycleOwner.lifecycleScope.launch {

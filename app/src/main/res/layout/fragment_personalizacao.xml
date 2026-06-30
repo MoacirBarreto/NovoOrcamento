@@ -154,6 +154,45 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+
+                <!-- Adicione estas View e Buttons dentro do último LinearLayout do arquivo -->
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="?attr/colorOutlineVariant" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPoliticaPrivacidade"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/politica_de_privacidade"
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@drawable/ic_check"
+                    app:iconTint="?attr/colorOnSurfaceVariant" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="?attr/colorOutlineVariant" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVideoDemonstracao"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/Lume_youtube"
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@android:drawable/ic_menu_slideshow"
+                    app:iconTint="#FF0000" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAvaliar"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
