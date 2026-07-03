@@ -122,6 +122,7 @@ class NovoLancamentoActivity : AppCompatActivity() {
                 db.agendaDao().buscarPorId(id)?.let {
                     agendaParaEditar = it
                     withContext(Dispatchers.Main) {
+                        // Verifique se a ordem bate com: String, Double, TipoLancamento, Long, Int
                         preencherCampos(it.descricao, it.valor, it.tipo, it.data, it.categoriaID)
                     }
                 }
@@ -129,7 +130,11 @@ class NovoLancamentoActivity : AppCompatActivity() {
                 db.orcamentoDao().buscarPorId(id)?.let {
                     lancamentoParaEditar = it
                     withContext(Dispatchers.Main) {
-                        preencherCampos(it.descricao, it.valor, it.tipo, it.data, it.categoriaID)
+                        // O erro ocorre aqui. Verifique se it.tipo e it.data estão corretos.
+                        // Se it.data for String no seu Model Lancamento, converta para Long:
+                        val dataLong =
+                            it.data // Se já for Long, ok. Se for String, use it.data.toLong()
+                        preencherCampos(it.descricao, it.valor, it.tipo, dataLong, it.categoriaID)
                     }
                 }
             }

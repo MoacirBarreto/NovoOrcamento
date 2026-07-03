@@ -130,6 +130,23 @@
                     app:icon="@android:drawable/ic_menu_save"
                     app:iconTint="@color/lume_primary" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFazerBackup"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="@string/backup_dados"
+                    app:icon="@android:drawable/ic_menu_save" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRestaurarBackup"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="@string/restaurar_backup"
+                    app:icon="@android:drawable/ic_menu_revert" />
+
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

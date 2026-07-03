@@ -71,4 +71,6 @@
     <string name="fazer_lancamento">Fazer lançamento</string>
     <string name="politica_de_privacidade">Política de Privacidade</string>
     <string name="Lume_youtube">Conheça o Lume (Youtube)</string>
+    <string name="backup_dados">Fazer Backup dos Dados</string>
+    <string name="restaurar_backup">Restaurar Backup</string>
 </resources>

@@ -173,7 +173,8 @@ class HomeFragment : Fragment() {
 
     private fun atualizarResumo(lista: List<Lancamento>) {
         val totalReceitas = lista.filter { it.tipo == TipoLancamento.RECEITA }.sumOf { it.valor }
-        val totalDespesas = lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf { it.valor }
+        val totalDespesas = lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf {
+            it.valor }
         val saldo = totalReceitas - totalDespesas
 
         val formato = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))

@@ -2,7 +2,6 @@ package com.moacir.Lume.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -10,22 +9,17 @@ import androidx.room.PrimaryKey
     foreignKeys = [
         ForeignKey(
             entity = Categoria::class,
-            parentColumns = ["id"],
-            childColumns = ["categoriaID"],
+            parentColumns = ["id"], // Ensure this matches the ID column in Categoria entity
+            childColumns = ["categoriaID"], // Changed from "categoria_id" to "categoriaID"
             onDelete = ForeignKey.CASCADE
         )
-    ],
-    // ADICIONE ESTA LINHA ABAIXO PARA CORRIGIR O ERRO
-    indices = [Index(value = ["categoriaID"])]
+    ]
 )
 data class Lancamento(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val descricao: String,
     val valor: Double,
-    val data: Long, // Guardaremos data como milissegundos (timestamp)
-
-    val categoriaID: Int, // Chave estrangeira indexada
-    val tipo: TipoLancamento // Enum (RECEITA ou DESPESA)
+    val data: Long,
+    val categoriaID: Int, // This is the name Room is using for the column
+    val tipo: TipoLancamento
 )
