@@ -40,14 +40,11 @@ class GraficosFragment : Fragment() {
     private var _binding: FragmentGraficosBinding? = null
     private val binding get() = _binding!!
     private lateinit var database: AppDatabase
-
     private var dataInicioPersonalizada: Long = 0L
     private var dataFimPersonalizada: Long = 0L
-
     private val corLaranjaLume = Color.parseColor("#EF6C00")
     private val corMarromLume = Color.parseColor("#5D4037")
     private val corMarromEscuro = Color.parseColor("#3E2723")
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
