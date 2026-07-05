@@ -21,6 +21,7 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.moacir.Lume.database.AppDatabase
 import com.moacir.Lume.databinding.FragmentGraficosBinding
@@ -81,10 +82,13 @@ class GraficosFragment : Fragment() {
         }
     }
 
+
     private fun carregarDadosGrafico(chipId: Int) {
         viewLifecycleOwner.lifecycleScope.launch {
             val (lista, categorias, evolucao) = withContext(Dispatchers.IO) {
                 val cal = Calendar.getInstance()
+
+                // Zera o calendário para o início do dia atual (00:00:00.000)
                 cal.set(Calendar.HOUR_OF_DAY, 0)
                 cal.set(Calendar.MINUTE, 0)
                 cal.set(Calendar.SECOND, 0)
@@ -92,20 +96,35 @@ class GraficosFragment : Fragment() {
 
                 val resultado = when (chipId) {
                     R.id.chipMesAtualGrafico -> {
+                        // Força para o primeiro dia do mês atual às 00:00:00
                         cal.set(Calendar.DAY_OF_MONTH, 1)
-                        db.orcamentoDao().listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
+                        val inicioMes = cal.timeInMillis
+
+                        // Define o limite como o final do dia atual ou final do mês
+                        db.orcamentoDao().listarLancamentosPorPeriodo(inicioMes, Long.MAX_VALUE)
                     }
+
                     R.id.chip30DiasGrafico -> {
+                        // Subtrai 30 dias a partir de hoje às 00:00:00
                         cal.add(Calendar.DAY_OF_YEAR, -30)
                         db.orcamentoDao().listarLancamentosPorPeriodo(cal.timeInMillis, Long.MAX_VALUE)
                     }
+
                     R.id.chipPorPeriodoGrafico -> {
-                        db.orcamentoDao().listarLancamentosPorPeriodo(dataInicioPersonalizada, dataFimPersonalizada)
+                        db.orcamentoDao().listarLancamentosPorPeriodo(
+                            dataInicioPersonalizada,
+                            dataFimPersonalizada
+                        )
                     }
+
                     else -> db.orcamentoDao().listarLancamentosSemFlow()
                 }
 
-                Triple(resultado, db.orcamentoDao().listarCategorias(), db.orcamentoDao().obterEvolucaoSaldo().first())
+                Triple(
+                    resultado,
+                    db.orcamentoDao().listarCategorias(),
+                    db.orcamentoDao().obterEvolucaoSaldo().first()
+                )
             }
 
             atualizarResumo(lista)
@@ -114,7 +133,6 @@ class GraficosFragment : Fragment() {
             atualizarGraficoLinha(evolucao)
         }
     }
-
     private fun abrirSeletorDeData() {
         val builder = MaterialDatePicker.Builder.dateRangePicker()
         builder.setTitleText("Filtrar Gráficos")
@@ -125,12 +143,16 @@ class GraficosFragment : Fragment() {
             val dataFim = selection.second
 
             if (dataInicio != null && dataFim != null) {
+                // Compensação de fuso horário para garantir a data correta no Brasil
                 val offset = TimeZone.getDefault().getOffset(Date().time).toLong()
                 dataInicioPersonalizada = dataInicio + offset
-                dataFimPersonalizada = dataFim + offset + 86399999
+                dataFimPersonalizada = dataFim + offset + 86399999 // Final do dia
 
                 val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
-                binding.chipPorPeriodoGrafico.text = "${formato.format(Date(dataInicioPersonalizada))} - ${formato.format(Date(dataFimPersonalizada))}"
+                binding.chipPorPeriodoGrafico.text =
+                    "${formato.format(Date(dataInicioPersonalizada))} - ${
+                        formato.format(Date(dataFimPersonalizada))
+                    }"
                 carregarDadosGrafico(R.id.chipPorPeriodoGrafico)
             }
         }
@@ -143,6 +165,8 @@ class GraficosFragment : Fragment() {
             binding.lineChart.clear(); return
         }
         val corTexto = obterCorTextoBase()
+
+        // Filtrar apenas os últimos 12 meses
         val formatoMesAno = SimpleDateFormat("yyyy-MM", Locale.US)
         val cal = Calendar.getInstance()
         val mesesPermitidos = mutableListOf<String>()
@@ -151,7 +175,10 @@ class GraficosFragment : Fragment() {
             cal.add(Calendar.MONTH, -1)
         }
 
-        val dadosFiltrados = dados.filter { it.mesAno in mesesPermitidos }.sortedBy { it.mesAno }
+        val dadosFiltrados = dados
+            .filter { it.mesAno in mesesPermitidos }
+            .sortedBy { it.mesAno }
+
         if (dadosFiltrados.isEmpty()) {
             binding.lineChart.clear(); return
         }
@@ -159,53 +186,52 @@ class GraficosFragment : Fragment() {
         val entries = mutableListOf<Entry>()
         val labelsX = mutableListOf<String>()
         val coresCirculos = mutableListOf<Int>()
-
-        // Cores baseadas no seu colors.xml
-        val corLume = ContextCompat.getColor(requireContext(), R.color.lume_orange_primary)
-        val corSucesso = ContextCompat.getColor(requireContext(), R.color.status_green)
-        val corErro = ContextCompat.getColor(requireContext(), R.color.status_red)
+        val corLume = ContextCompat.getColor(requireContext(), R.color.lume_primary)
+        val corErro = ContextCompat.getColor(requireContext(), R.color.lume_error)
 
         dadosFiltrados.forEachIndexed { index, item ->
             entries.add(Entry(index.toFloat(), item.saldo.toFloat()))
             labelsX.add(formatarMesAno(item.mesAno))
-            coresCirculos.add(if (item.saldo >= 0) corSucesso else corErro)
+            coresCirculos.add(if (item.saldo >= 0) corLume else corErro)
         }
 
         val dataSet = LineDataSet(entries, "Evolução do Saldo").apply {
             color = corLume
             circleColors = coresCirculos
-            lineWidth = 2.5f
+            lineWidth = 2f
             circleRadius = 5f
             valueTextColor = corTexto
             setDrawValues(true)
             setDrawFilled(true)
             fillColor = corLume
             fillAlpha = 40
+            mode = LineDataSet.Mode.LINEAR
+
         }
 
         binding.lineChart.apply {
             data = LineData(dataSet)
             xAxis.apply {
                 textColor = corTexto
-                position = XAxis.XAxisPosition.BOTTOM
-                setDrawGridLines(false)
+                isGranularityEnabled = true
                 granularity = 1f
+                setLabelCount(labelsX.size, false)
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
                         val index = value.toInt()
-                        return if (index in labelsX.indices) labelsX[index] else ""
+                        return if (index >= 0 && index < labelsX.size) labelsX[index] else ""
                     }
                 }
             }
             axisLeft.textColor = corTexto
-            axisRight.isEnabled = false
-            description.isEnabled = false
+            setDrawBorders(false)
             animateX(1000)
             invalidate()
         }
     }
 
     private fun atualizarGraficoBarras(lista: List<Lancamento>) {
+        // Cálculo otimizado em uma única passagem
         var totalReceitas = 0.0
         var totalDespesas = 0.0
         lista.forEach {
@@ -214,34 +240,19 @@ class GraficosFragment : Fragment() {
         }
 
         val corTexto = obterCorTextoBase()
-        // Usando status_green e status_red do seu colors.xml
-        val corReceita = ContextCompat.getColor(requireContext(), R.color.status_green)
-        val corDespesa = ContextCompat.getColor(requireContext(), R.color.status_red)
-
         val dataSet = BarDataSet(
             listOf(BarEntry(0f, totalReceitas.toFloat()), BarEntry(1f, totalDespesas.toFloat())), ""
         ).apply {
-            colors = listOf(corReceita, corDespesa)
+            colors = listOf(Color.rgb(76, 175, 80), Color.rgb(244, 67, 54))
             valueFormatter = CurrencyFormatter()
             valueTextSize = 10f
             valueTextColor = corTexto
         }
 
         binding.barChart.apply {
-            data = BarData(dataSet).apply { barWidth = 0.6f }
-            xAxis.apply {
-                textColor = corTexto
-                position = XAxis.XAxisPosition.BOTTOM
-                setDrawGridLines(false)
-                valueFormatter = object : ValueFormatter() {
-                    override fun getFormattedValue(value: Float): String {
-                        return if (value == 0f) "Receitas" else if (value == 1f) "Despesas" else ""
-                    }
-                }
-            }
+            data = BarData(dataSet).apply { barWidth = 0.5f }
+            xAxis.textColor = corTexto
             axisLeft.textColor = corTexto
-            axisRight.isEnabled = false
-            description.isEnabled = false
             animateY(800)
             invalidate()
         }
@@ -257,18 +268,36 @@ class GraficosFragment : Fragment() {
         val mapaCats = categorias.associateBy({ it.id }, { it.nome })
         val entries = despesas.groupBy { it.categoriaID }
             .map { (catId, itens) ->
-                PieEntry(itens.sumOf { it.valor }.toFloat(), mapaCats[catId] ?: "Outras")
+                PieEntry(
+                    itens.sumOf { it.valor }.toFloat(),
+                    mapaCats[catId] ?: "Outras"
+                )
             }
 
         val dataSet = PieDataSet(entries, "").apply {
-            colors = obterPaletaCores()
+            // --- ALTERAÇÃO AQUI: Paleta Expandida de 10 cores ---
+            colors = listOf(
+                Color.rgb(103, 58, 183),  // Roxo (Deep Purple)
+                Color.rgb(33, 150, 243),  // Azul (Blue)
+                Color.rgb(0, 150, 136),   // Teai (Verde Água)
+                Color.rgb(255, 193, 7),   // Âmbar (Amarelo)
+                Color.rgb(233, 30, 99),   // Rosa (Pink)
+                Color.rgb(156, 39, 176),  // Violeta
+                Color.rgb(0, 188, 212),   // Ciano
+                Color.rgb(139, 195, 74),  // Lima
+                Color.rgb(255, 87, 34),   // Laranja Profundo
+                Color.rgb(96, 125, 139)   // Cinza Azulado (Blue Grey)
+            )
+            // ---------------------------------------------------
+
             yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
             valueTextSize = 11f
             sliceSpace = 3f
             valueTextColor = corTexto
             valueLineColor = corTexto
             valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String = String.format("%.1f%%", value)
+                override fun getFormattedValue(value: Float): String =
+                    String.format("%.1f%%", value)
             }
         }
 
@@ -276,34 +305,27 @@ class GraficosFragment : Fragment() {
             data = PieData(dataSet)
             setUsePercentValues(true)
             setEntryLabelColor(corTexto)
-            setHoleColor(Color.TRANSPARENT)
             legend.textColor = corTexto
+            // Melhora a visualização
             legend.isWordWrapEnabled = true
-            description.isEnabled = false
             animateXY(800, 800)
             invalidate()
         }
-    }
-
-    private fun obterPaletaCores(): List<Int> {
-        return listOf(
-            ContextCompat.getColor(requireContext(), R.color.lume_orange_primary),
-            ContextCompat.getColor(requireContext(), R.color.status_green),
-            ContextCompat.getColor(requireContext(), R.color.lume_orange_light),
-            Color.parseColor("#4DB6AC"), // Teal alternativo (Manual)
-            Color.parseColor("#9575CD"), // Purple alternativo (Manual)
-            Color.parseColor("#FFD54F"), // Amber
-            Color.parseColor("#F06292"), // Pink
-            Color.parseColor("#4FC3F7")  // Light Blue
-        )
     }
 
     private fun configurarGraficoLinhaInicial() {
         val cor = obterCorTextoBase()
         binding.lineChart.apply {
             description.isEnabled = false
-            setNoDataText("Carregando evolução...")
-            setNoDataTextColor(cor)
+            setNoDataText("Iluminando dados...")
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                textColor = cor
+                setDrawGridLines(false)
+            }
+            axisLeft.textColor = cor
+            axisRight.isEnabled = false
+            legend.textColor = cor
         }
     }
 
@@ -311,8 +333,18 @@ class GraficosFragment : Fragment() {
         val cor = obterCorTextoBase()
         binding.barChart.apply {
             description.isEnabled = false
-            setNoDataText("Sem dados no período")
-            setNoDataTextColor(cor)
+            xAxis.apply {
+                textColor = cor
+                position = XAxis.XAxisPosition.BOTTOM
+                valueFormatter = object : ValueFormatter() {
+                    private val labels = listOf("Receitas", "Despesas")
+                    override fun getFormattedValue(value: Float): String =
+                        labels.getOrNull(value.toInt()) ?: ""
+                }
+            }
+            axisLeft.textColor = cor
+            axisRight.isEnabled = false
+            legend.textColor = cor
         }
     }
 
@@ -320,10 +352,11 @@ class GraficosFragment : Fragment() {
         val cor = obterCorTextoBase()
         binding.pieChart.apply {
             description.isEnabled = false
-            holeRadius = 45f
-            transparentCircleRadius = 50f
-            setNoDataText("Adicione despesas para ver a divisão")
-            setNoDataTextColor(cor)
+            holeRadius = 40f
+            transparentCircleRadius = 45f
+            setHoleColor(Color.TRANSPARENT)
+            legend.textColor = cor
+            setNoDataText("Adicione despesas para ver o gráfico")
         }
     }
 
@@ -337,9 +370,12 @@ class GraficosFragment : Fragment() {
         binding.txtTotalDespesasGrafico.text = fmt.format(despesas)
         binding.txtSaldoFinalGrafico.apply {
             text = fmt.format(saldo)
-            // Usando as cores de status para o texto do resumo também
-            setTextColor(ContextCompat.getColor(requireContext(),
-                if (saldo >= 0) R.color.status_green else R.color.status_red))
+            setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    if (saldo >= 0) R.color.lume_primary else R.color.lume_error
+                )
+            )
         }
     }
 
@@ -352,7 +388,11 @@ class GraficosFragment : Fragment() {
 
     private fun obterCorTextoBase(): Int {
         val typedValue = TypedValue()
-        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+        requireContext().theme.resolveAttribute(
+            com.google.android.material.R.attr.colorOnSurface,
+            typedValue,
+            true
+        )
         return typedValue.data
     }
 

@@ -2,16 +2,19 @@ package com.moacir.Lume
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.moacir.Lume.database.AppDatabase
+import com.moacir.Lume.database.BackupManager
 import com.moacir.Lume.databinding.FragmentPersonalizacaoBinding
 import com.moacir.Lume.model.Categoria
 import kotlinx.coroutines.Dispatchers
@@ -19,11 +22,34 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PersonFragment : Fragment() {
-
     private var _binding: FragmentPersonalizacaoBinding? = null
     private val binding get() = _binding!!
     private lateinit var db: AppDatabase
+
     private var nomesAntigosParaBackup: List<String> = emptyList()
+
+    // Launchers para abrir o seletor de arquivos
+    private val exportLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+            uri?.let { BackupManager.exportDatabase(requireContext(), it) }
+        }
+
+    private val importLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                BackupManager.importDatabase(requireContext(), it) {
+                    // A melhor forma de garantir que o banco novo seja lido:
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Restauração Concluída")
+                        .setMessage("O app será fechado para atualizar os dados.")
+                        .setPositiveButton("OK") { _, _ ->
+                            // Mata o processo do app
+                            android.os.Process.killProcess(android.os.Process.myPid())
+                        }
+                        .show()
+                }
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,28 +64,78 @@ class PersonFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         db = AppDatabase.getDatabase(requireContext())
         configurarCliques()
+        exibirVersaoDoApp(view)
+        binding.btnPoliticaPrivacidade.setOnClickListener {
+            abrirLink("https://sites.google.com/view/lume-app-privacidade/inicio")
+        }
+        binding.btnVideoDemonstracao.setOnClickListener {
+            abrirLink("https://www.youtube.com/watch?v=31GiE_RpAMM")
+        }
+    }
+
+    private fun abrirLink(url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Não foi possível abrir o link", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    private fun exibirVersaoDoApp(view: View) {
+        try {
+            val context = requireContext()
+            val packageInfo =
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getPackageInfo(
+                        context.packageName,
+                        PackageManager.PackageInfoFlags.of(0)
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    context.packageManager.getPackageInfo(context.packageName, 0)
+                }
+
+            val versionName = packageInfo.versionName
+            binding.txtVersaoApp.text = "Versão $versionName"
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun configurarCliques() {
-        // 1. Clique para Gerenciar Categorias (Abre um diálogo ou lógica de edição)
         binding.btnCategorias.setOnClickListener {
             exibirDialogoGerenciarCategorias()
         }
 
-        // 2. Clique para Resetar Tutorial de Boas-Vindas
         binding.btnResetBoasVindas.setOnClickListener {
             exibirDialogoReativarBoasVindas()
         }
 
-        // 3. Clique para Avaliar na Play Store
         binding.btnAvaliar.setOnClickListener {
             abrirPlayStoreParaAvaliar()
         }
 
-        // 4. Cliques de Monetização / Premium (Cards e Botões Pro)
         binding.cardPremium.setOnClickListener { exibirDialogoPremium() }
         binding.btnSejaPro.setOnClickListener { exibirDialogoPremium() }
         binding.btnExportarPDF.setOnClickListener { exibirDialogoPremium() }
+        binding.btnFazerBackup.setOnClickListener {
+            val dataHora =
+                java.text.SimpleDateFormat("ddMMyyyy_HHmm", java.util.Locale.getDefault())
+                    .format(java.util.Date())
+            exportLauncher.launch("Lume_Backup_$dataHora.db")
+        }
+
+        binding.btnRestaurarBackup.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Atenção")
+                .setMessage("Ao restaurar, os dados atuais serão apagados. Deseja continuar?")
+                .setPositiveButton("Sim") { _, _ -> importLauncher.launch("*/*") }
+                .setNegativeButton("Cancelar", null)
+                .show()
+        }
     }
 
     private fun exibirDialogoGerenciarCategorias() {
@@ -122,7 +198,6 @@ class PersonFragment : Fragment() {
             }
         }
     }
-
 
     private fun reiniciarParaPadrao() {
         viewLifecycleOwner.lifecycleScope.launch {

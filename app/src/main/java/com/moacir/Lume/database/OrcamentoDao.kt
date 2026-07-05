@@ -3,12 +3,13 @@ package com.moacir.Lume.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
 import androidx.room.Upsert
 import com.moacir.Lume.model.Agenda
 import com.moacir.Lume.model.Categoria
+import com.moacir.Lume.model.CategoriaResumo
 import com.moacir.Lume.model.Lancamento
 import com.moacir.Lume.model.SaldoMensal
 import kotlinx.coroutines.flow.Flow
@@ -19,20 +20,11 @@ interface OrcamentoDao {
     @Upsert
     suspend fun upsertLancamento(lancamento: Lancamento)
 
-    @Insert
-    fun inserirCategoria(categoria: Categoria)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun inserirCategoriasIniciais(categorias: List<Categoria>)
 
     @Query("SELECT * FROM categorias WHERE id > 1 ORDER BY nome ASC")
     suspend fun listarCategorias(): List<Categoria>
-
-    @Insert
-    fun inserirLancamento(lancamento: Lancamento)
-
-    @Query("SELECT * FROM lancamentos ORDER BY data DESC")
-    fun listarLancamentos(): Flow<List<Lancamento>>
-
-    @Update
-    fun atualizarLancamento(lancamento: Lancamento)
 
     @Delete
     suspend fun deletarLancamento(lancamento: Lancamento)
@@ -43,15 +35,6 @@ interface OrcamentoDao {
     @Transaction
     @Upsert
     suspend fun upsertCategoria(categoria: Categoria)
-
-    @Transaction
-    suspend fun atualizarCategoriasFixas(nomes: List<String>) {
-        for (i in nomes.indices) {
-            val id = i + 2 // Começando do 2 conforme sua lógica de fragment_personalizacao
-            val categoria = Categoria(id = id, nome = nomes[i])
-            upsertCategoria(categoria)
-        }
-    }
 
     @Query("SELECT * FROM lancamentos")
     suspend fun listarLancamentosSemFlow(): List<Lancamento>
@@ -87,4 +70,15 @@ interface OrcamentoDao {
     // Busca vencimentos na tabela de Agenda para o alerta de 7 dias
     @Query("SELECT * FROM agenda WHERE data BETWEEN :hoje AND :proximaSemana ORDER BY data ASC")
     fun listarVencimentosProximos(hoje: Long, proximaSemana: Long): Flow<List<Agenda>>
+
+    @Query(
+        """
+    SELECT c.nome as nome, SUM(t.valor) as valor 
+    FROM lancamentos t
+    INNER JOIN categorias c ON t.categoriaID = c.id
+    WHERE t.tipo = 'DESPESA' AND t.data >= :inicio AND t.data <= :fim 
+    GROUP BY c.nome
+"""
+    )
+    suspend fun obterDespesasPorCategoria(inicio: Long, fim: Long): List<CategoriaResumo>
 }

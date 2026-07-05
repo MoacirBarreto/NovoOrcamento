@@ -17,7 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- CARD DE ALERTA DE VENCIMENTOS (7 DIAS) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardAlertaVencimento"
         android:layout_width="0dp"
@@ -94,7 +93,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- RECYCLYEVIEW: Ancorado abaixo do Card de Alerta ou do Título -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAgenda"
         android:layout_width="match_parent"

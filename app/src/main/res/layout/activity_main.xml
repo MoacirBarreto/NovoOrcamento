@@ -6,9 +6,8 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    tools:context="com.moacir.Lume.MainActivity">
 
-    <!-- BARRA DE TÍTULO (MATERIAL 3) -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -32,8 +31,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- CONTAINER DE NAVEGAÇÃO (NAV HOST) -->
-    <!-- Mudei o ID para nav_host_fragment para seguir o padrão -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -46,7 +43,6 @@
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:navGraph="@navigation/nav_graph" />
 
-    <!-- BARRA DE NAVEGAÇÃO INFERIOR -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="0dp"

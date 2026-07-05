@@ -8,17 +8,13 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 import java.text.NumberFormat
 import java.util.Locale
-
-class CustomMarkerView(context: Context, layoutResource: Int) :
-    MarkerView(context, layoutResource) {
+class CustomMarkerView(context: Context, layoutResource: Int) : MarkerView(context, layoutResource) {
 
     private val tvContent: TextView = findViewById(R.id.tvContent)
+    private val format = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
 
     override fun refreshContent(e: Entry?, highlight: Highlight?) {
-        val valor = e?.y?.toDouble() ?: 0.0
-        val fmt = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
-        tvContent.text = fmt.format(valor)
-
+        tvContent.text = format.format(e?.y ?: 0f)
         super.refreshContent(e, highlight)
     }
 

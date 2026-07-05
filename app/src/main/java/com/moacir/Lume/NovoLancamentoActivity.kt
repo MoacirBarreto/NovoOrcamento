@@ -35,7 +35,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
     private var lancamentoParaEditar: Lancamento? = null
     private var agendaParaEditar: Agenda? = null
 
-    // Trava para evitar que o Spinner mude a descrição durante o preenchimento automático
     private var bloqueioManual = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,15 +68,11 @@ class NovoLancamentoActivity : AppCompatActivity() {
     private fun carregarDadosIniciais() {
         lifecycleScope.launch {
             val idRecebido = intent.getIntExtra("LANCAMENTO_ID", -1)
-
-            // 1. Configura visibilidade do container de repetição
             binding.containerRepetir.visibility =
                 if (isAgenda && idRecebido == -1) View.VISIBLE else View.GONE
 
-            // 2. Busca categorias no banco
             categorias = withContext(Dispatchers.IO) { db.orcamentoDao().listarCategorias() }
 
-            // 3. Configura Spinner
             val adapter = ArrayAdapter(
                 this@NovoLancamentoActivity,
                 android.R.layout.simple_spinner_dropdown_item,
@@ -85,7 +80,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
             )
             binding.spinnerCategorias.adapter = adapter
 
-            // 4. Listener do Spinner com lógica de atualização de descrição
             binding.spinnerCategorias.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
@@ -98,10 +92,8 @@ class NovoLancamentoActivity : AppCompatActivity() {
                             val novaCatNome = categorias[position].nome
                             val descAtual = binding.edtDescricao.text.toString().trim()
 
-                            // Lista de nomes de categorias para comparar
                             val nomesDasCategorias = categorias.map { it.nome.lowercase() }
 
-                            // ATUALIZA SE: a descrição estiver vazia OU se a descrição atual for o nome de alguma categoria
                             if (descAtual.isEmpty() || nomesDasCategorias.contains(descAtual.lowercase())) {
                                 binding.edtDescricao.setText(novaCatNome)
                             }
@@ -111,13 +103,11 @@ class NovoLancamentoActivity : AppCompatActivity() {
                     override fun onNothingSelected(p: AdapterView<*>?) {}
                 }
 
-            // 5. Se for edição, carrega os dados
             if (idRecebido != -1) {
                 bloqueioManual = true // Ativa a trava antes de começar a carregar
                 binding.txtTituloTela.text = if (isAgenda) "Editar Agenda" else "Editar Lançamento"
                 carregarParaEdicao(idRecebido)
 
-                // Libera a trava apenas depois que tudo foi preenchido
                 bloqueioManual = false
             } else {
                 binding.txtTituloTela.text = if (isAgenda) "Nova Agenda" else "Novo Lançamento"
@@ -132,6 +122,7 @@ class NovoLancamentoActivity : AppCompatActivity() {
                 db.agendaDao().buscarPorId(id)?.let {
                     agendaParaEditar = it
                     withContext(Dispatchers.Main) {
+                        // Verifique se a ordem bate com: String, Double, TipoLancamento, Long, Int
                         preencherCampos(it.descricao, it.valor, it.tipo, it.data, it.categoriaID)
                     }
                 }
@@ -139,7 +130,11 @@ class NovoLancamentoActivity : AppCompatActivity() {
                 db.orcamentoDao().buscarPorId(id)?.let {
                     lancamentoParaEditar = it
                     withContext(Dispatchers.Main) {
-                        preencherCampos(it.descricao, it.valor, it.tipo, it.data, it.categoriaID)
+                        // O erro ocorre aqui. Verifique se it.tipo e it.data estão corretos.
+                        // Se it.data for String no seu Model Lancamento, converta para Long:
+                        val dataLong =
+                            it.data // Se já for Long, ok. Se for String, use it.data.toLong()
+                        preencherCampos(it.descricao, it.valor, it.tipo, dataLong, it.categoriaID)
                     }
                 }
             }
@@ -167,7 +162,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
 
             val posicao = categorias.indexOfFirst { it.id == catId }
             if (posicao != -1) {
-                // Ao setar a seleção aqui, o bloqueioManual impede que a descrição seja alterada
                 spinnerCategorias.setSelection(posicao)
             }
         }
@@ -265,20 +259,15 @@ class NovoLancamentoActivity : AppCompatActivity() {
 
     private fun configurarCampoData() {
         binding.edtData.setOnClickListener {
-            // Criamos o seletor garantindo que ele comece na data que já está na tela
             val builder = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione a Data")
                 .setSelection(dataSelecionadaMillis)
 
             val picker = builder.build()
             picker.addOnPositiveButtonClickListener { selection ->
-                // O MaterialDatePicker retorna a data em UTC meia-noite.
-                // Para evitar que o fuso horário do Brasil (UTC-3) jogue a data para o dia anterior,
-                // precisamos compensar o offset.
                 val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
                 calendar.timeInMillis = selection
 
-                // Agora convertemos para o calendário local sem mudar o dia
                 val localCalendar = Calendar.getInstance()
                 localCalendar.set(
                     calendar.get(Calendar.YEAR),
@@ -293,8 +282,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
     }
 
     private fun atualizarTextoData(calendario: Calendar) {
-        // Zeramos as horas, minutos e segundos para garantir que a
-        // data selecionada represente o início do dia (00:00:00)
         calendario.set(Calendar.HOUR_OF_DAY, 0)
         calendario.set(Calendar.MINUTE, 0)
         calendario.set(Calendar.SECOND, 0)

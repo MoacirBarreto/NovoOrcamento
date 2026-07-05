@@ -15,7 +15,6 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- REMOVIDO O IMAGEVIEW DO ÍCONE AQUI -->
 
         <TextView
             android:id="@+id/tvDescricao"
@@ -28,7 +27,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Compra de Supermercado" />
-        <!-- Note acima: layout_constraintStart_toStartOf="parent" agora -->
 
         <TextView
             android:id="@+id/tvData"

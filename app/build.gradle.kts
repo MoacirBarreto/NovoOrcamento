@@ -12,9 +12,8 @@ android {
         applicationId = "com.moacir.Lume"
         minSdk = 29
         targetSdk = 35
-        versionCode = 5 // Incremente para 2, 3... em cada nova versão da Play Store
-        versionName = "1.5"
-
+        versionCode = 7 // Incremente para 2, 3... em cada nova versão da Play Store
+        versionName = "1.7.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ksp {
@@ -56,6 +55,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    buildToolsVersion = "34.0.0"
 }
 
 dependencies {
@@ -94,4 +94,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation("com.google.android.material:material:1.12.0")
 }

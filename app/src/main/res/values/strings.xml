@@ -57,7 +57,7 @@
     <string name="contas_a_vencer">Contas a vencer nos próximos 7 dias</string>
     <string name="nenhuma_conta_proxima">Tudo em dia para os próximos 7 dias! 🎉</string>
     <string name="alerta_vencimento">Atenção ao vencimento!</string>
-    <string name="versao_app">Versão 1.0.0 (Lume Free)</string>
+    <string name="versao_app">Versão 1.6.1 (Lume Free)</string>
     <string name="ver_tutorial_novamente">Ver tutorial novamente</string>
     <string name="avaliar_play">Avaliar na Play Store</string>
     <string name="sobre_o_app">Sobre o App</string>
@@ -69,4 +69,8 @@
     <string name="lume_pro">Lume Pro 🔥</string>
     <string name="personalize_cat">Personalize suas categorias de despesas:</string>
     <string name="fazer_lancamento">Fazer lançamento</string>
+    <string name="politica_de_privacidade">Política de Privacidade</string>
+    <string name="Lume_youtube">Conheça o Lume (Youtube)</string>
+    <string name="backup_dados">Fazer Backup dos Dados</string>
+    <string name="restaurar_backup">Restaurar Backup</string>
 </resources>

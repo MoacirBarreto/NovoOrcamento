@@ -22,7 +22,8 @@ class LancamentoAdapter(
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LancamentoViewHolder {
-        val binding = ItemLancamentoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemLancamentoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return LancamentoViewHolder(binding)
     }
 

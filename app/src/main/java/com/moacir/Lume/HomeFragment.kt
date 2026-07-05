@@ -173,7 +173,8 @@ class HomeFragment : Fragment() {
 
     private fun atualizarResumo(lista: List<Lancamento>) {
         val totalReceitas = lista.filter { it.tipo == TipoLancamento.RECEITA }.sumOf { it.valor }
-        val totalDespesas = lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf { it.valor }
+        val totalDespesas = lista.filter { it.tipo == TipoLancamento.DESPESA }.sumOf {
+            it.valor }
         val saldo = totalReceitas - totalDespesas
 
         val formato = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
@@ -182,7 +183,6 @@ class HomeFragment : Fragment() {
         binding.txtTotalDespesas.text = formato.format(totalDespesas)
         binding.txtSaldoFinal.text = formato.format(saldo)
 
-        // Define a cor do saldo (Verde para positivo, Vermelho para negativo)
         val cor = if (saldo >= 0) R.color.green else R.color.red
         binding.txtSaldoFinal.setTextColor(ContextCompat.getColor(requireContext(), cor))
     }
