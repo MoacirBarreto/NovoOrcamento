@@ -3,6 +3,10 @@ package com.moacir.Lume.model
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.Index
+import com.moacir.Lume.model.Categoria
+import com.moacir.Lume.model.TipoLancamento
+
 
 @Entity(
     tableName = "lancamentos",
@@ -13,7 +17,8 @@ import androidx.room.PrimaryKey
             childColumns = ["categoriaID"], // Changed from "categoria_id" to "categoriaID"
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+            indices = [Index(value = ["categoriaID"])]
 )
 data class Lancamento(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

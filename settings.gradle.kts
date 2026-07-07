@@ -38,6 +38,5 @@ dependencyResolutionManagement {
     }
 }
 
-
 rootProject.name = "Lume"
 include(":app")
