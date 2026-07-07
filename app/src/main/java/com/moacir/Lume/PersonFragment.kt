@@ -75,7 +75,7 @@ class PersonFragment : Fragment() {
 
     private fun abrirLink(url: String) {
         try {
-            val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Não foi possível abrir o link", Toast.LENGTH_SHORT)
