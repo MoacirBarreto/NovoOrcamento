@@ -26,8 +26,6 @@ class PersonFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var db: AppDatabase
 
-    private var nomesAntigosParaBackup: List<String> = emptyList()
-
     // Launchers para abrir o seletor de arquivos
     private val exportLauncher =
         registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
@@ -41,9 +39,9 @@ class PersonFragment : Fragment() {
                     // A melhor forma de garantir que o banco novo seja lido:
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Restauração Concluída")
-                        .setMessage("O app será fechado para atualizar os dados.")
+                        .setMessage("O banco de dados foi restaurado. O app será reiniciado para atualizar os dados.")
+                        .setCancelable(false)
                         .setPositiveButton("OK") { _, _ ->
-                            // Mata o processo do app
                             android.os.Process.killProcess(android.os.Process.myPid())
                         }
                         .show()

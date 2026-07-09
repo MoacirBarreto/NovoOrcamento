@@ -2,59 +2,48 @@ package com.moacir.Lume.database
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
-import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
 object BackupManager {
-    private const val DATABASE_NAME = "orcamento_db"
+    private const val DB_NAME = "lume_database" // Nome definido no seu AppDatabase
 
     fun exportDatabase(context: Context, destinationUri: Uri) {
         try {
-            val dbFile = context.getDatabasePath(DATABASE_NAME)
-            val outputStream = context.contentResolver.openOutputStream(destinationUri)
-            val inputStream = FileInputStream(dbFile)
+            val dbFile = context.getDatabasePath(DB_NAME)
+            // Se usar WAL mode, pode precisar de dbFile-shm e dbFile-wal,
+            // mas no Lume estamos focando no arquivo principal.
 
-            outputStream?.use { output ->
-                inputStream.use { input ->
+            context.contentResolver.openOutputStream(destinationUri)?.use { output ->
+                FileInputStream(dbFile).use { input ->
                     input.copyTo(output)
                 }
             }
-            Toast.makeText(context, "Backup concluído!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Backup concluído com sucesso!", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(context, "Erro ao exportar: ${e.message}", Toast.LENGTH_LONG).show()
+            Log.e("Backup", "Erro ao exportar: ${e.message}")
+            Toast.makeText(context, "Erro ao exportar backup", Toast.LENGTH_SHORT).show()
         }
     }
 
     fun importDatabase(context: Context, sourceUri: Uri, onComplete: () -> Unit) {
         try {
-            val dbName = "orcamento_db"
-            val dbFile = context.getDatabasePath(dbName)
+            val dbFile = context.getDatabasePath(DB_NAME)
 
-            // 1. FECHAR O BANCO E LIMPAR A INSTÂNCIA
+            // Fecha o banco antes de sobrescrever para evitar corrupção
             AppDatabase.getDatabase(context).close()
 
-            // 2. Copiar os arquivos
-            val inputStream = context.contentResolver.openInputStream(sourceUri)
-            val outputStream = FileOutputStream(dbFile)
-            inputStream?.use { input ->
-                outputStream.use { output ->
+            context.contentResolver.openInputStream(sourceUri)?.use { input ->
+                FileOutputStream(dbFile).use { output ->
                     input.copyTo(output)
                 }
             }
-
-            // 3. DELETAR arquivos temporários (WAL e SHM) - ISSO É VITAL
-            val shmFile = File(dbFile.path + "-shm")
-            val walFile = File(dbFile.path + "-wal")
-            shmFile.delete()
-            walFile.delete()
-
             onComplete()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("Backup", "Erro ao importar: ${e.message}")
+            Toast.makeText(context, "Arquivo de backup inválido", Toast.LENGTH_SHORT).show()
         }
     }
-
 }
