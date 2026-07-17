@@ -32,7 +32,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "orcamento_db"
                 )
-                    .fallbackToDestructiveMigration(true)
+                    .fallbackToDestructiveMigration()
                     .addCallback(DatabaseCallback)
                     .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
                     .build()

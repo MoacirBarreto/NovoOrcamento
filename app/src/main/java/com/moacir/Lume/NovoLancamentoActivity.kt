@@ -46,7 +46,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
         configurarInterfaceInicial()
         carregarDadosIniciais()
     }
-
     private fun configurarInterfaceInicial() {
         atualizarTextoData(Calendar.getInstance())
         configurarCampoValor()
@@ -55,7 +54,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
         configurarBotaoSalvar()
         configurarCheckRepetir()
     }
-
     private fun configurarCheckRepetir() {
         binding.chkRepetir.setOnCheckedChangeListener { _, isChecked ->
             val visibilidade = if (isChecked) View.VISIBLE else View.GONE
@@ -64,7 +62,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
             if (!isChecked) binding.edtQtdMeses.setText("")
         }
     }
-
     private fun carregarDadosIniciais() {
         lifecycleScope.launch {
             val idRecebido = intent.getIntExtra("LANCAMENTO_ID", -1)
@@ -115,7 +112,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
             }
         }
     }
-
     private suspend fun carregarParaEdicao(id: Int) {
         withContext(Dispatchers.IO) {
             if (isAgenda) {
@@ -140,7 +136,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun preencherCampos(
         desc: String,
         valor: Double,
