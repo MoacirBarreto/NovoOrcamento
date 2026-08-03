@@ -26,10 +26,12 @@
     <!-- Basic Colors -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
-    <!-- Colors requested by your layouts -->
     <color name="green">#4CAF50</color>
     <color name="red">#F44336</color>
+
+    <!-- Semantic Colors -->
+    <color name="status_positive">#4CAF50</color>
+    <color name="status_negative">#F44336</color>
     <color name="lume_error">#B00020</color>
 
     <!-- Colors requested by bg_lume_soft.xml -->

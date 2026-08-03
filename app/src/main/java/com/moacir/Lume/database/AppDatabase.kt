@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 @Database(
     entities = [Categoria::class, Lancamento::class, Agenda::class],
     version = 8,
-    exportSchema = false
+    exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun orcamentoDao(): OrcamentoDao
@@ -25,6 +25,13 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        private val MIGRATION_7_8 = object : androidx.room.migration.Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Criação do índice que foi adicionado na versão 8
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_lancamentos_categoriaID` ON `lancamentos` (`categoriaID`)")
+            }
+        }
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -32,7 +39,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "orcamento_db"
                 )
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_7_8)
                     .addCallback(DatabaseCallback)
                     .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
                     .build()

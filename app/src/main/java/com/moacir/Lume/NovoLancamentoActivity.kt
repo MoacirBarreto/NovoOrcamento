@@ -7,7 +7,11 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.moacir.Lume.database.AppDatabase
@@ -38,8 +42,18 @@ class NovoLancamentoActivity : AppCompatActivity() {
     private var bloqueioManual = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(
+                top = insets.top,
+                bottom = insets.bottom
+            )
+            windowInsets
+        }
 
         isAgenda = intent.getBooleanExtra("IS_AGENDA", false)
 
@@ -118,7 +132,6 @@ class NovoLancamentoActivity : AppCompatActivity() {
                 db.agendaDao().buscarPorId(id)?.let {
                     agendaParaEditar = it
                     withContext(Dispatchers.Main) {
-                        // Verifique se a ordem bate com: String, Double, TipoLancamento, Long, Int
                         preencherCampos(it.descricao, it.valor, it.tipo, it.data, it.categoriaID)
                     }
                 }
@@ -126,11 +139,7 @@ class NovoLancamentoActivity : AppCompatActivity() {
                 db.orcamentoDao().buscarPorId(id)?.let {
                     lancamentoParaEditar = it
                     withContext(Dispatchers.Main) {
-                        // O erro ocorre aqui. Verifique se it.tipo e it.data estão corretos.
-                        // Se it.data for String no seu Model Lancamento, converta para Long:
-                        val dataLong =
-                            it.data // Se já for Long, ok. Se for String, use it.data.toLong()
-                        preencherCampos(it.descricao, it.valor, it.tipo, dataLong, it.categoriaID)
+                        preencherCampos(it.descricao, it.valor, it.tipo, it.data, it.categoriaID)
                     }
                 }
             }

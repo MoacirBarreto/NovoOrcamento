@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.XAxis
@@ -22,24 +23,28 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.moacir.Lume.database.AppDatabase
+import com.moacir.Lume.database.OrcamentoRepository
 import com.moacir.Lume.databinding.FragmentGraficosBinding
 import com.moacir.Lume.model.CategoriaResumo
 import com.moacir.Lume.model.SaldoMensal
-import kotlinx.coroutines.Dispatchers
+import com.moacir.Lume.util.FormatUtils
+import com.moacir.Lume.viewmodel.GraficosViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.text.SimpleDateFormat
 
 class GraficosFragment : Fragment() {
 
     private var _binding: FragmentGraficosBinding? = null
     private val binding get() = _binding!!
-    private lateinit var database: AppDatabase
+
+    private val viewModel: GraficosViewModel by viewModels {
+        GraficosViewModel.Factory(OrcamentoRepository(AppDatabase.getDatabase(requireContext())))
+    }
 
     private val corLaranjaLume = Color.parseColor("#EF6C00")
     private val corMarromLume = Color.parseColor("#5D4037")
@@ -54,11 +59,22 @@ class GraficosFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        database = AppDatabase.getDatabase(requireContext())
 
         configurarEstilosIniciais()
         configurarFiltros()
         restaurarEstadoChips()
+        observarDados()
+    }
+
+    private fun observarDados() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.resumo.collectLatest { data ->
+                atualizarCardResumo(data.receitas, data.despesas)
+                atualizarBarras(data.receitas.toFloat(), data.despesas.toFloat())
+                atualizarLinhas(data.evolucaoSaldo)
+                atualizarPizzaReal(data.despesasPorCategoria)
+            }
+        }
     }
 
     private fun restaurarEstadoChips() {
@@ -67,11 +83,10 @@ class GraficosFragment : Fragment() {
 
         // Sincroniza o texto do botão
         if (ConfiguracoesApp.temPeriodoPersonalizado()) {
-            val formato = SimpleDateFormat("dd/MM", Locale("pt", "BR"))
-            val textoData = "${formato.format(Date(ConfiguracoesApp.dataInicioGlobal))} - ${
-                formato.format(Date(ConfiguracoesApp.dataFimGlobal))
-            }"
-            binding.chipPorPeriodoGrafico.text = textoData
+            binding.chipPorPeriodoGrafico.text = FormatUtils.formatarPeriodo(
+                ConfiguracoesApp.dataInicioGlobal,
+                ConfiguracoesApp.dataFimGlobal
+            )
         } else {
             binding.chipPorPeriodoGrafico.text = "Por Período"
         }
@@ -82,7 +97,7 @@ class GraficosFragment : Fragment() {
         restaurarEstadoChips()
 
         if (ConfiguracoesApp.ultimoChipGraficos == R.id.chipPorPeriodoGrafico && ConfiguracoesApp.temPeriodoPersonalizado()) {
-            observarDadosReais(ConfiguracoesApp.dataInicioGlobal, ConfiguracoesApp.dataFimGlobal)
+            viewModel.carregarDados(ConfiguracoesApp.dataInicioGlobal, ConfiguracoesApp.dataFimGlobal)
         } else {
             processarFiltro(ConfiguracoesApp.ultimoChipGraficos)
         }
@@ -100,7 +115,7 @@ class GraficosFragment : Fragment() {
                 if (!ConfiguracoesApp.temPeriodoPersonalizado()) {
                     abrirSeletorDeData()
                 } else if (anterior != R.id.chipPorPeriodoGrafico) {
-                    observarDadosReais(
+                    viewModel.carregarDados(
                         ConfiguracoesApp.dataInicioGlobal,
                         ConfiguracoesApp.dataFimGlobal
                     )
@@ -142,7 +157,7 @@ class GraficosFragment : Fragment() {
                 ConfiguracoesApp.dataFimGlobal = dataFim + offset + 86399999
 
                 restaurarEstadoChips()
-                observarDadosReais(
+                viewModel.carregarDados(
                     ConfiguracoesApp.dataInicioGlobal,
                     ConfiguracoesApp.dataFimGlobal
                 )
@@ -185,38 +200,22 @@ class GraficosFragment : Fragment() {
             binding.chipPorPeriodoGrafico.text = "Por Período"
         }
 
-        observarDadosReais(inicio, fim)
-    }
-
-    private fun observarDadosReais(inicio: Long, fim: Long) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val resumo = database.orcamentoDao().obterResumoFinanceiro(inicio, fim)
-            val despesasPorCategoria =
-                database.orcamentoDao().obterDespesasPorCategoria(inicio, fim)
-
-            database.orcamentoDao().obterEvolucaoSaldo().collect { listaSaldo ->
-                withContext(Dispatchers.Main) {
-                    if (_binding != null) {
-                        atualizarCardResumo(resumo.receitas, resumo.despesas)
-                        atualizarBarras(resumo.receitas.toFloat(), resumo.despesas.toFloat())
-                        atualizarLinhas(listaSaldo)
-                        atualizarPizzaReal(despesasPorCategoria)
-                    }
-                }
-            }
-        }
+        viewModel.carregarDados(inicio, fim)
     }
 
     private fun atualizarCardResumo(receitas: Double, despesas: Double) {
-        val formato = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
         val saldo = receitas - despesas
 
-        binding.txtTotalReceitasGrafico.text = formato.format(receitas)
-        binding.txtTotalDespesasGrafico.text = formato.format(despesas)
-        binding.txtSaldoFinalGrafico.text = formato.format(saldo)
+        binding.txtTotalReceitasGrafico.text = FormatUtils.formatarMoeda(receitas)
+        binding.txtTotalDespesasGrafico.text = FormatUtils.formatarMoeda(despesas)
+        binding.txtSaldoFinalGrafico.text = FormatUtils.formatarMoeda(saldo)
 
         // Cor do saldo igual à Home
-        val corSaldo = if (saldo >= 0) Color.parseColor("#4CAF50") else Color.parseColor("#F44336")
+        val corSaldo = if (saldo >= 0) {
+            androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_positive)
+        } else {
+            androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_negative)
+        }
         binding.txtSaldoFinalGrafico.setTextColor(corSaldo)
     }
 
@@ -287,8 +286,11 @@ class GraficosFragment : Fragment() {
             return
         }
         val entries = listOf(BarEntry(0f, receitas), BarEntry(1f, despesas))
+        val colorPositive = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_positive)
+        val colorNegative = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.status_negative)
+
         val dataSet = BarDataSet(entries, "").apply {
-            colors = listOf(Color.parseColor("#4CAF50"), Color.parseColor("#F44336"))
+            colors = listOf(colorPositive, colorNegative)
             valueTextColor = obterCorTextoTema()
             valueTextSize = 10f
         }

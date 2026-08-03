@@ -44,7 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/RS_0"
-                    android:textColor="@color/green"
+                    android:textColor="@color/status_positive"
                     android:textStyle="bold"
                     android:textSize="16sp"/>
             </LinearLayout>
@@ -68,7 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/RS_0"
-                    android:textColor="@color/red"
+                    android:textColor="@color/status_negative"
                     android:textStyle="bold"
                     android:textSize="16sp"/>
             </LinearLayout>
