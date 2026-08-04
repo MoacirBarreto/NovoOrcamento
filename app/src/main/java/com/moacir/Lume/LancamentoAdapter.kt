@@ -18,7 +18,7 @@ class LancamentoAdapter(
     val onItemLongClick: (Lancamento) -> Unit
 ) : RecyclerView.Adapter<LancamentoAdapter.LancamentoViewHolder>() {
 
-    inner class LancamentoViewHolder(val binding: ItemLancamentoBinding) :
+    class LancamentoViewHolder(val binding: ItemLancamentoBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LancamentoViewHolder {

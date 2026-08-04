@@ -112,12 +112,6 @@
                     app:icon="@android:drawable/ic_menu_edit"
                     app:iconTint="?attr/colorOnSurfaceVariant" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:background="?attr/colorOutlineVariant" />
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnExportarPDF"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
@@ -128,25 +122,31 @@
                     android:text="@string/exportar_pdf"
                     android:textColor="?attr/colorOnSurface"
                     app:icon="@android:drawable/ic_menu_save"
-                    app:iconTint="@color/lume_primary" />
+                    app:iconTint="?attr/colorOnSurfaceVariant" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFazerBackup"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingHorizontal="16dp"
                     android:text="@string/backup_dados"
-                    app:icon="@android:drawable/ic_menu_save" />
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@android:drawable/ic_menu_save"
+                    app:iconTint="?attr/colorOnSurfaceVariant" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnRestaurarBackup"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
+                    android:gravity="start|center_vertical"
+                    android:paddingHorizontal="16dp"
                     android:text="@string/restaurar_backup"
-                    app:icon="@android:drawable/ic_menu_revert" />
-
-
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@android:drawable/ic_menu_revert"
+                    app:iconTint="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -171,7 +171,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-
                 <!-- Adicione estas View e Buttons dentro do último LinearLayout do arquivo -->
 
                 <View
@@ -192,12 +191,6 @@
                     app:icon="@android:drawable/ic_menu_info_details"
                     app:iconTint="?attr/colorOnSurfaceVariant" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:background="?attr/colorOutlineVariant" />
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnVideoDemonstracao"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
@@ -209,12 +202,6 @@
                     android:textColor="?attr/colorOnSurface"
                     app:icon="@android:drawable/ic_menu_slideshow"
                     app:iconTint="#FF0000" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:background="?attr/colorOutlineVariant" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAvaliar"
@@ -228,12 +215,6 @@
                     app:icon="@android:drawable/btn_star"
                     app:iconTint="?attr/colorOnSurfaceVariant" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:background="?attr/colorOutlineVariant" />
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnResetBoasVindas"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
@@ -245,12 +226,6 @@
                     android:textColor="?attr/colorOnSurface"
                     app:icon="@android:drawable/ic_menu_help"
                     app:iconTint="?attr/colorOnSurfaceVariant" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginHorizontal="16dp"
-                    android:background="?attr/colorOutlineVariant" />
 
                 <TextView
                     android:id="@+id/txtVersaoApp"

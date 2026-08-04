@@ -20,10 +20,12 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilValor"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:hint="@string/valor_RS"
+        app:layout_constraintEnd_toStartOf="@+id/btnColar"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtTituloTela">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -33,6 +35,19 @@
             android:inputType="number"
             android:maxLength="15" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnColar"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        app:icon="@drawable/ic_paste"
+        app:iconTint="?attr/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@id/tilValor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tilValor"
+        android:contentDescription="@string/colar" />
 
     <TextView
         android:id="@+id/lblTipo"

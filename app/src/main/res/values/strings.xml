@@ -70,7 +70,15 @@
     <string name="personalize_cat">Personalize suas categorias de despesas:</string>
     <string name="fazer_lancamento">Fazer lançamento</string>
     <string name="politica_de_privacidade">Política de Privacidade</string>
-    <string name="Lume_youtube">Conheça o Lume (Youtube)</string>
+    <string name="Lume_youtube">Conheça o Lume (YouTube)</string>
     <string name="backup_dados">Fazer Backup dos Dados</string>
     <string name="restaurar_backup">Restaurar Backup</string>
+    <string name="colar">Colar</string>
+
+    <!-- Atualização -->
+    <string name="update_available_title">Atualização Disponível 🚀</string>
+    <string name="update_available_msg">Uma nova versão do Lume está disponível! Por segurança, recomendamos fazer um backup dos seus dados antes de atualizar.</string>
+    <string name="btn_backup_now">Fazer Backup Agora</string>
+    <string name="btn_update_now">Atualizar Agora</string>
+    <string name="btn_later">Mais Tarde</string>
 </resources>

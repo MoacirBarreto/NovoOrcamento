@@ -88,6 +88,7 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.play.app.update)
 
     // Testes
     testImplementation(libs.junit)

@@ -15,7 +15,7 @@ class AgendaAdapter(
     private val onItemClick: (Agenda) -> Unit    // Este deve ser o Click Curto (Editar)
 ) : RecyclerView.Adapter<AgendaAdapter.AgendaViewHolder>() {
 
-    inner class AgendaViewHolder(val binding: ItemAgendaBinding) :
+    class AgendaViewHolder(val binding: ItemAgendaBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AgendaViewHolder {

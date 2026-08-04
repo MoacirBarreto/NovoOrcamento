@@ -41,7 +41,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     .addMigrations(MIGRATION_7_8)
                     .addCallback(DatabaseCallback)
-                    .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+                    .setJournalMode(JournalMode.TRUNCATE)
                     .build()
                 INSTANCE = instance
                 instance

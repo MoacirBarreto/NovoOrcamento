@@ -1,5 +1,7 @@
 package com.moacir.Lume
 
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -67,6 +69,7 @@ class NovoLancamentoActivity : AppCompatActivity() {
         configurarMudancaDeTipo()
         configurarBotaoSalvar()
         configurarCheckRepetir()
+        configurarBotaoColar()
     }
     private fun configurarCheckRepetir() {
         binding.chkRepetir.setOnCheckedChangeListener { _, isChecked ->
@@ -342,5 +345,25 @@ class NovoLancamentoActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun configurarBotaoColar() {
+        binding.btnColar.setOnClickListener {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val item = clipboard.primaryClip?.getItemAt(0)
+            val pasteData = item?.text?.toString() ?: ""
+            if (pasteData.isNotEmpty()) {
+                // Remove tudo que não for número antes de colar, para o TextWatcher formatar corretamente
+                val cleanData = pasteData.replace(Regex("[^0-9]"), "")
+                if (cleanData.isNotEmpty()) {
+                    binding.edtValor.setText(cleanData)
+                    Toast.makeText(this, "Colado!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Nenhum valor numérico encontrado", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "Área de transferência vazia", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
