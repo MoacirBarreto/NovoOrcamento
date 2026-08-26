@@ -12,12 +12,12 @@ android {
         applicationId = "com.moacir.Lume"
         minSdk = 29
         targetSdk = 36
-        versionCode = 9 // Incremente para 2, 3... em cada nova versão da Play Store
-        versionName = "1.9.2"
+        versionCode = 10 // Incremente para 2, 3... em cada nova versão da Play Store
+        versionName = "1.10.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
+            arg("room.schemaLocation", "${project.projectDir}/schemas")
         }
     }
 
